@@ -1,0 +1,36 @@
+.daikon-character {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.daikon-character__image {
+  width: min(60vw, 240px);
+  height: auto;
+  animation: daikon-float 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 12px 18px rgba(80, 55, 10, 0.25));
+}
+
+@keyframes daikon-float {
+  0% {
+    transform: translateY(0) rotate(-2deg) scale(1);
+  }
+  25% {
+    transform: translateY(-14px) rotate(1deg) scale(1.02);
+  }
+  50% {
+    transform: translateY(-4px) rotate(3deg) scale(1);
+  }
+  75% {
+    transform: translateY(-18px) rotate(-1deg) scale(0.99);
+  }
+  100% {
+    transform: translateY(0) rotate(-2deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daikon-character__image {
+    animation: none;
+  }
+}
