@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import "./App.css";
-import { DaikonCharacter } from "./components/DaikonCharacter.jsx";
+import { AquariumScene } from "./components/AquariumScene.jsx";
 import { DashiGauge } from "./components/DashiGauge.jsx";
 import { DebugPanel } from "./components/DebugPanel.jsx";
 import { DAIKON_CHARACTER_ID } from "./constants.js";
@@ -29,8 +29,10 @@ export function App() {
   return (
     <div className="app">
       <main className="app__tank">
-        <DaikonCharacter />
-        <DashiGauge dashiLevel={dashiLevel} />
+        <AquariumScene />
+        <div className="app__hud">
+          <DashiGauge dashiLevel={dashiLevel} />
+        </div>
       </main>
       {debugMode && <DebugPanel onAdvanceHours={handleAdvanceHours} />}
     </div>
