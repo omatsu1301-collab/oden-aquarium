@@ -30,9 +30,11 @@ export function App() {
     <div className="app">
       <main className="app__tank">
         <AquariumScene />
-        <div className="app__hud">
-          <DashiGauge dashiLevel={dashiLevel} />
-        </div>
+        {debugMode && (
+          <div className="app__hud">
+            <DashiGauge dashiLevel={dashiLevel} />
+          </div>
+        )}
       </main>
       {debugMode && <DebugPanel onAdvanceHours={handleAdvanceHours} />}
     </div>
