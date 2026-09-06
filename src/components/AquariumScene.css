@@ -11,18 +11,89 @@
   height: 100%;
   object-fit: cover;
   object-position: center top;
+  /* 「背景画像そのものが動いている」ように見せず、水中の光量が
+     わずかに変化している程度に留める(brightnessのみ、位置/scaleは動かさない)。 */
+  animation: aquarium-light-shimmer 7.5s ease-in-out infinite;
+}
+
+@keyframes aquarium-light-shimmer {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.045);
+  }
+}
+
+.aquarium-scene__bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aquarium-scene__bubble {
+  position: absolute;
+  bottom: -5%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 244, 214, 0.15) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  animation-name: aquarium-bubble-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes aquarium-bubble-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: var(--bubble-opacity, 0.35);
+  }
+  85% {
+    opacity: var(--bubble-opacity, 0.35);
+  }
+  100% {
+    transform: translateY(var(--bubble-rise, -90vh));
+    opacity: 0;
+  }
+}
+
+/* 大根・ちくわそれぞれの「位置決め+浮遊アニメーション」を担当するwrapper。
+   soak表現(filter)は内側のimg側の責務にして、transformと競合しないようにする。 */
+.aquarium-scene__daikon-float {
+  position: absolute;
+  left: 26%;
+  top: 30%;
+  height: 24%;
+  transform-origin: 50% 60%;
+  animation: aquarium-float-daikon 4.8s ease-in-out infinite;
+}
+
+.aquarium-scene__chikuwa-float {
+  position: absolute;
+  left: 46%;
+  top: 52%;
+  height: 20%;
+  transform-origin: 50% 50%;
+  animation: aquarium-float-chikuwa 6.2s ease-in-out infinite;
+  animation-delay: -1.7s;
 }
 
 .aquarium-scene__character {
-  position: absolute;
+  display: block;
+  height: 100%;
   width: auto;
   filter: drop-shadow(0 14px 20px rgba(60, 35, 5, 0.28));
 }
 
 .aquarium-scene__daikon {
-  left: 26%;
-  top: 30%;
-  height: 24%;
   --soak-t: 0;
   /* soakProgress(0-100 → --soak-tは0-1)に応じて、白っぽい入りたて状態から
      艶のある黄金色の染み染み状態までを既存のPNG1枚+CSS filterだけで表現する。
@@ -36,8 +107,199 @@
   transition: filter 0.5s ease-out;
 }
 
-.aquarium-scene__chikuwa {
-  left: 46%;
-  top: 52%;
-  height: 20%;
+/* 大根: ゆったりめ・上下中心・回転小さめ */
+@keyframes aquarium-float-daikon {
+  0% {
+    transform: translate(0, 0) rotate(-1.5deg);
+  }
+  25% {
+    transform: translate(1.5%, -7%) rotate(0.5deg);
+  }
+  50% {
+    transform: translate(-1%, -3%) rotate(1.5deg);
+  }
+  75% {
+    transform: translate(1%, -9%) rotate(-0.5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-1.5deg);
+  }
+}
+
+/* ちくわ: 大根より横方向を含み、回転もやや大きめ。durationとdelayもずらす */
+@keyframes aquarium-float-chikuwa {
+  0% {
+    transform: translate(0, 0) rotate(1deg);
+  }
+  30% {
+    transform: translate(-3%, -5%) rotate(4.5deg);
+  }
+  60% {
+    transform: translate(2%, -7%) rotate(-0.5deg);
+  }
+  85% {
+    transform: translate(-1.5%, -3%) rotate(4deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(1deg);
+  }
+}
+
+/* 大根タップ反応: 見た目はHTML buttonらしさを一切出さない */
+.aquarium-scene__daikon-tap {
+  all: unset;
+  display: inline-block;
+  position: relative;
+  height: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  --flee-dir: 1;
+}
+
+.aquarium-scene__daikon-tap.is-tapped {
+  animation: aquarium-daikon-tap-react 450ms ease-out;
+}
+
+/* ぷるん(squash/stretch)+ 数px〜十数pxの微小な逃げ + 軽い回転。
+   0%/100%はidentityへ戻すため、連打しても変形が蓄積しない。 */
+@keyframes aquarium-daikon-tap-react {
+  0% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+  15% {
+    transform: scale(1.08, 0.9) translate(calc(var(--flee-dir) * -3px), 2px)
+      rotate(calc(var(--flee-dir) * -3deg));
+  }
+  40% {
+    transform: scale(0.93, 1.1) translate(calc(var(--flee-dir) * -10px), -8px)
+      rotate(calc(var(--flee-dir) * -6deg));
+  }
+  70% {
+    transform: scale(1.04, 0.97) translate(calc(var(--flee-dir) * -5px), -3px)
+      rotate(calc(var(--flee-dir) * -2deg));
+  }
+  100% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+}
+
+/* 表情・感情の一瞬の変化: 顔を描き直す代わりに、キャラクター全体へ
+   ごく短い暖色のハイライトを重ねて「反応した感」を出す。
+   soakのfilterとは別要素(span)なので、soak表現を上書きしない。 */
+.aquarium-scene__daikon-sparkle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 45% 40%,
+    rgba(255, 250, 220, 0.9),
+    rgba(255, 210, 130, 0.35) 55%,
+    transparent 80%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.aquarium-scene__daikon-tap.is-tapped .aquarium-scene__daikon-sparkle {
+  animation: aquarium-daikon-tap-sparkle 400ms ease-out;
+}
+
+@keyframes aquarium-daikon-tap-sparkle {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  60% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* タップ泡: 常時泡(.aquarium-scene__bubble)とは別物。短時間で消える。 */
+.aquarium-scene__tap-bubbles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aquarium-scene__tap-bubble {
+  position: absolute;
+  bottom: 20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 244, 214, 0.2) 70%,
+    transparent 100%
+  );
+  opacity: 0;
+  animation-name: aquarium-tap-bubble-rise;
+  animation-timing-function: ease-out;
+}
+
+@keyframes aquarium-tap-bubble-rise {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-46px) scale(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aquarium-scene__background,
+  .aquarium-scene__daikon-float,
+  .aquarium-scene__chikuwa-float,
+  .aquarium-scene__bubble {
+    animation: none !important;
+  }
+
+  .aquarium-scene__daikon-tap.is-tapped {
+    /* 大きな移動・squash/stretchは止め、タップした事実だけ短く伝える。 */
+    animation: none !important;
+  }
+
+  .aquarium-scene__daikon-tap.is-tapped .aquarium-scene__daikon-sparkle {
+    animation: aquarium-daikon-tap-sparkle-reduced 300ms ease-out;
+  }
+
+  @keyframes aquarium-daikon-tap-sparkle-reduced {
+    0% {
+      opacity: 0;
+    }
+    30% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* タップ泡はonAnimationEndで自己削除するため、animation自体は
+     止めずに移動量だけ無くし、opacityフェードのみ残す。 */
+  .aquarium-scene__tap-bubble {
+    animation-name: aquarium-tap-bubble-fade-only;
+  }
+
+  @keyframes aquarium-tap-bubble-fade-only {
+    0% {
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
 }
