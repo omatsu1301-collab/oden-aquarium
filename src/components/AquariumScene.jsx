@@ -1,6 +1,7 @@
 // UIコンポーネント: 水槽の背景と、その上に配置したキャラクター画像の描画のみを担当する。
 // soakProgressに応じた大根の見た目変化はCSS変数経由でCSS側に委譲し、
 // このコンポーネント自体は状態計算を行わない。
+// 浮遊・泡・光ゆらぎもCSSアニメーションのみで実現し、新規ゲームロジックは持たない。
 import { getSoakVisualStyle } from "../presentation/soakVisual.js";
 import "./AquariumScene.css";
 
@@ -11,6 +12,20 @@ const backgroundImage = `${import.meta.env.BASE_URL}assets/backgrounds/aquarium-
 const daikonImage = `${import.meta.env.BASE_URL}assets/characters/daikon.png`;
 const chikuwaImage = `${import.meta.env.BASE_URL}assets/characters/chikuwa.png`;
 
+// 泡の見た目・タイミングは固定配列でばらけさせる(再レンダーのたびに
+// ランダム値が変わって位置が飛ばないよう、乱数は使わない)。
+const BUBBLES = [
+  { left: "8%", size: 5, duration: 7.2, delay: -1.4, rise: "-88vh", opacity: 0.35 },
+  { left: "18%", size: 3, duration: 6.1, delay: -4.8, rise: "-92vh", opacity: 0.25 },
+  { left: "30%", size: 6, duration: 8.4, delay: -2.9, rise: "-85vh", opacity: 0.4 },
+  { left: "42%", size: 4, duration: 6.8, delay: -0.6, rise: "-90vh", opacity: 0.3 },
+  { left: "58%", size: 3, duration: 7.9, delay: -5.6, rise: "-93vh", opacity: 0.28 },
+  { left: "68%", size: 5, duration: 6.5, delay: -3.3, rise: "-87vh", opacity: 0.38 },
+  { left: "78%", size: 4, duration: 8.9, delay: -1.9, rise: "-91vh", opacity: 0.32 },
+  { left: "88%", size: 6, duration: 7.5, delay: -4.1, rise: "-86vh", opacity: 0.42 },
+  { left: "50%", size: 3, duration: 9.3, delay: -6.4, rise: "-94vh", opacity: 0.22 },
+];
+
 export function AquariumScene({ soakProgress }) {
   return (
     <div className="aquarium-scene">
@@ -20,19 +35,43 @@ export function AquariumScene({ soakProgress }) {
         className="aquarium-scene__background"
         draggable={false}
       />
-      <img
-        src={daikonImage}
-        alt="大根キャラクター"
-        className="aquarium-scene__character aquarium-scene__daikon"
-        style={getSoakVisualStyle(soakProgress)}
-        draggable={false}
-      />
-      <img
-        src={chikuwaImage}
-        alt="ちくわキャラクター"
-        className="aquarium-scene__character aquarium-scene__chikuwa"
-        draggable={false}
-      />
+
+      <div className="aquarium-scene__bubbles" aria-hidden="true">
+        {BUBBLES.map((bubble, index) => (
+          <span
+            key={index}
+            className="aquarium-scene__bubble"
+            style={{
+              left: bubble.left,
+              width: `${bubble.size}px`,
+              height: `${bubble.size}px`,
+              animationDuration: `${bubble.duration}s`,
+              animationDelay: `${bubble.delay}s`,
+              "--bubble-rise": bubble.rise,
+              "--bubble-opacity": bubble.opacity,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="aquarium-scene__daikon-float">
+        <img
+          src={daikonImage}
+          alt="大根キャラクター"
+          className="aquarium-scene__character aquarium-scene__daikon"
+          style={getSoakVisualStyle(soakProgress)}
+          draggable={false}
+        />
+      </div>
+
+      <div className="aquarium-scene__chikuwa-float">
+        <img
+          src={chikuwaImage}
+          alt="ちくわキャラクター"
+          className="aquarium-scene__character aquarium-scene__chikuwa"
+          draggable={false}
+        />
+      </div>
     </div>
   );
 }
