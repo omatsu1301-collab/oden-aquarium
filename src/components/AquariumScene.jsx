@@ -13,6 +13,9 @@ import "./AquariumScene.css";
 const backgroundImage = `${import.meta.env.BASE_URL}assets/backgrounds/aquarium-background.webp`;
 const daikonImage = `${import.meta.env.BASE_URL}assets/characters/daikon.png`;
 const chikuwaImage = `${import.meta.env.BASE_URL}assets/characters/chikuwa.png`;
+const shiratakiImage = `${import.meta.env.BASE_URL}assets/characters/shirataki.png`;
+const konnyakuImage = `${import.meta.env.BASE_URL}assets/characters/konnyaku.png`;
+const ganmoImage = `${import.meta.env.BASE_URL}assets/characters/ganmo.png`;
 
 // 泡の見た目・タイミングは固定配列でばらけさせる(再レンダーのたびに
 // ランダム値が変わって位置が飛ばないよう、乱数は使わない)。
@@ -73,6 +76,30 @@ export function AquariumScene({ soakProgress }) {
         image={chikuwaImage}
         alt="ちくわキャラクター"
         imgClassName="aquarium-scene__chikuwa"
+      />
+
+      <Character
+        floatClassName="aquarium-scene__shirataki-float"
+        tapClassName="aquarium-scene__shirataki-tap"
+        image={shiratakiImage}
+        alt="しらたきキャラクター"
+        imgClassName="aquarium-scene__shirataki"
+      />
+
+      <Character
+        floatClassName="aquarium-scene__konnyaku-float"
+        tapClassName="aquarium-scene__konnyaku-tap"
+        image={konnyakuImage}
+        alt="こんにゃくキャラクター"
+        imgClassName="aquarium-scene__konnyaku"
+      />
+
+      <Character
+        floatClassName="aquarium-scene__ganmo-float"
+        tapClassName="aquarium-scene__ganmo-tap"
+        image={ganmoImage}
+        alt="がんもキャラクター"
+        imgClassName="aquarium-scene__ganmo"
       />
     </div>
   );

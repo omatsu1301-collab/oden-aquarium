@@ -65,25 +65,56 @@
   }
 }
 
-/* 大根・ちくわそれぞれの「位置決め+浮遊アニメーション」を担当するwrapper。
-   soak表現(filter)は内側のimg側の責務にして、transformと競合しないようにする。 */
+/* 5体それぞれの「位置決め+浮遊アニメーション」を担当するwrapper。
+   soak表現(filter)は内側のimg側の責務にして、transformと競合しないようにする。
+   大根・ちくわの位置は5体同居のため微調整(サイズ・浮遊値そのものは無変更)。 */
 .aquarium-scene__daikon-float {
   position: absolute;
-  left: 26%;
-  top: 30%;
-  height: 24%;
+  left: 21%;
+  top: 20%;
+  height: 22%;
   transform-origin: 50% 60%;
   animation: aquarium-float-daikon 4.8s ease-in-out infinite;
 }
 
 .aquarium-scene__chikuwa-float {
   position: absolute;
-  left: 46%;
-  top: 52%;
-  height: 20%;
+  left: 42%;
+  top: 47%;
+  height: 18%;
   transform-origin: 50% 50%;
   animation: aquarium-float-chikuwa 6.2s ease-in-out infinite;
   animation-delay: -1.7s;
+}
+
+.aquarium-scene__shirataki-float {
+  position: absolute;
+  left: 54%;
+  top: 12%;
+  height: 19%;
+  transform-origin: 50% 40%;
+  animation: aquarium-float-shirataki 7.6s ease-in-out infinite;
+  animation-delay: -2.6s;
+}
+
+.aquarium-scene__konnyaku-float {
+  position: absolute;
+  left: 66%;
+  top: 55%;
+  height: 14%;
+  transform-origin: 50% 55%;
+  animation: aquarium-float-konnyaku 4.1s ease-in-out infinite;
+  animation-delay: -0.9s;
+}
+
+.aquarium-scene__ganmo-float {
+  position: absolute;
+  left: 12%;
+  top: 58%;
+  height: 15%;
+  transform-origin: 50% 55%;
+  animation: aquarium-float-ganmo 8.6s ease-in-out infinite;
+  animation-delay: -4.3s;
 }
 
 .aquarium-scene__character {
@@ -142,6 +173,60 @@
   }
   100% {
     transform: translate(0, 0) rotate(1deg);
+  }
+}
+
+/* しらたき: ゆっくり漂い揺れる印象。大根より周期を長く、揺れは滑らかに。 */
+@keyframes aquarium-float-shirataki {
+  0% {
+    transform: translate(0, 0) rotate(-1deg);
+  }
+  30% {
+    transform: translate(2%, -5%) rotate(1.5deg);
+  }
+  55% {
+    transform: translate(-2%, -8%) rotate(-1.5deg);
+  }
+  80% {
+    transform: translate(1.5%, -4%) rotate(1deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-1deg);
+  }
+}
+
+/* こんにゃく: 小さくぷるっと漂う印象。周期は短く、振幅は控えめ。 */
+@keyframes aquarium-float-konnyaku {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(1%, -3%) rotate(-2deg);
+  }
+  50% {
+    transform: translate(-1%, -5%) rotate(2deg);
+  }
+  75% {
+    transform: translate(1%, -2%) rotate(-1deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/* がんも: やや重そうにゆっくり浮く印象。周期は最も長く、回転はごく小さい。 */
+@keyframes aquarium-float-ganmo {
+  0% {
+    transform: translate(0, 0) rotate(0.5deg);
+  }
+  40% {
+    transform: translate(0.5%, -4%) rotate(-0.5deg);
+  }
+  70% {
+    transform: translate(-0.5%, -2%) rotate(0.5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0.5deg);
   }
 }
 
@@ -210,6 +295,80 @@
   }
   100% {
     transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
+.aquarium-scene__shirataki-tap.is-tapped {
+  animation: aquarium-shirataki-tap-react 500ms ease-out;
+}
+
+/* しらたきのタップ個性: 波打つようなゆるやかな伸縮+ごく軽い逃げ。
+   大根のsquash/stretchより穏やかで、時間も少し長め。 */
+@keyframes aquarium-shirataki-tap-react {
+  0% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: scale(0.97, 1.05) translate(calc(var(--flee-dir) * -4px), -2px)
+      rotate(calc(var(--flee-dir) * -2deg));
+  }
+  50% {
+    transform: scale(1.05, 0.95) translate(calc(var(--flee-dir) * -9px), -6px)
+      rotate(calc(var(--flee-dir) * -4deg));
+  }
+  80% {
+    transform: scale(0.99, 1.02) translate(calc(var(--flee-dir) * -3px), -2px)
+      rotate(calc(var(--flee-dir) * -1deg));
+  }
+  100% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+}
+
+.aquarium-scene__konnyaku-tap.is-tapped {
+  animation: aquarium-konnyaku-tap-react 340ms ease-out;
+}
+
+/* こんにゃくのタップ個性: 小さく素早いバウンド。他キャラより短時間・
+   小振幅で「ぷるっ」とした軽い質感を出す。 */
+@keyframes aquarium-konnyaku-tap-react {
+  0% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1, 0.88) translate(calc(var(--flee-dir) * -5px), 1px)
+      rotate(calc(var(--flee-dir) * 5deg));
+  }
+  55% {
+    transform: scale(0.92, 1.08) translate(calc(var(--flee-dir) * -8px), -4px)
+      rotate(calc(var(--flee-dir) * -3deg));
+  }
+  100% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+}
+
+.aquarium-scene__ganmo-tap.is-tapped {
+  animation: aquarium-ganmo-tap-react 520ms ease-out;
+}
+
+/* がんものタップ個性: 重みを感じさせるゆっくりめの縦方向squish。
+   横移動は控えめにし、他キャラより鈍い質感にする。 */
+@keyframes aquarium-ganmo-tap-react {
+  0% {
+    transform: scale(1, 1) translate(0, 0);
+  }
+  25% {
+    transform: scale(1.06, 0.9) translate(calc(var(--flee-dir) * -2px), 3px);
+  }
+  55% {
+    transform: scale(0.95, 1.07) translate(calc(var(--flee-dir) * -6px), -5px);
+  }
+  85% {
+    transform: scale(1.02, 0.98) translate(calc(var(--flee-dir) * -2px), -1px);
+  }
+  100% {
+    transform: scale(1, 1) translate(0, 0);
   }
 }
 
@@ -291,6 +450,9 @@
   .aquarium-scene__background,
   .aquarium-scene__daikon-float,
   .aquarium-scene__chikuwa-float,
+  .aquarium-scene__shirataki-float,
+  .aquarium-scene__konnyaku-float,
+  .aquarium-scene__ganmo-float,
   .aquarium-scene__bubble {
     animation: none !important;
   }
