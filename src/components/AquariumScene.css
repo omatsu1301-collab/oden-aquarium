@@ -67,7 +67,8 @@
 
 /* 5体それぞれの「位置決め+浮遊アニメーション」を担当するwrapper。
    soak表現(filter)は内側のimg側の責務にして、transformと競合しないようにする。
-   大根・ちくわの位置は5体同居のため微調整(サイズ・浮遊値そのものは無変更)。 */
+   大根・ちくわは5体同居のため位置とheightを微調整した
+   (大根24%→22%、ちくわ20%→18%。浮遊keyframe自体・soak表現は無変更)。 */
 .aquarium-scene__daikon-float {
   position: absolute;
   left: 21%;
