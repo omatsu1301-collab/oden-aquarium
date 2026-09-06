@@ -145,8 +145,10 @@
   }
 }
 
-/* 大根タップ反応: 見た目はHTML buttonらしさを一切出さない */
-.aquarium-scene__daikon-tap {
+/* タップ可能なキャラクター共通の土台。見た目はHTML buttonらしさを
+   一切出さない。個々のキャラクター用クラス(-daikon-tap/-chikuwa-tap)を
+   併せて指定し、そちらでは反応の質感(keyframe)だけを変える。 */
+.aquarium-scene__tap {
   all: unset;
   display: inline-block;
   position: relative;
@@ -160,8 +162,8 @@
   animation: aquarium-daikon-tap-react 450ms ease-out;
 }
 
-/* ぷるん(squash/stretch)+ 数px〜十数pxの微小な逃げ + 軽い回転。
-   0%/100%はidentityへ戻すため、連打しても変形が蓄積しない。 */
+/* 大根のタップ個性: ぷるん(squash/stretch)+ 数px〜十数pxの微小な逃げ +
+   軽い回転。0%/100%はidentityへ戻すため、連打しても変形が蓄積しない。 */
 @keyframes aquarium-daikon-tap-react {
   0% {
     transform: scale(1, 1) translate(0, 0) rotate(0deg);
@@ -183,10 +185,39 @@
   }
 }
 
+.aquarium-scene__chikuwa-tap.is-tapped {
+  animation: aquarium-chikuwa-tap-react 380ms ease-out;
+}
+
+/* ちくわのタップ個性: 大根の squash/stretch とは違い、軽い回転+横への
+   逃げ+均等な弾みで表現する(大根の反応の単純なコピーにしない)。
+   横方向の移動量・回転量は大根より大きめ。durationも大根より短く軽快。 */
+@keyframes aquarium-chikuwa-tap-react {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  20% {
+    transform: translate(calc(var(--flee-dir) * -8px), -2px)
+      rotate(calc(var(--flee-dir) * 8deg)) scale(1.05);
+  }
+  50% {
+    transform: translate(calc(var(--flee-dir) * -14px), -6px)
+      rotate(calc(var(--flee-dir) * 10deg)) scale(0.97);
+  }
+  75% {
+    transform: translate(calc(var(--flee-dir) * -6px), -1px)
+      rotate(calc(var(--flee-dir) * 4deg)) scale(1.02);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+}
+
 /* 表情・感情の一瞬の変化: 顔を描き直す代わりに、キャラクター全体へ
    ごく短い暖色のハイライトを重ねて「反応した感」を出す。
-   soakのfilterとは別要素(span)なので、soak表現を上書きしない。 */
-.aquarium-scene__daikon-sparkle {
+   soakのfilterとは別要素(span)なので、soak表現を上書きしない。
+   大根・ちくわで共通の見た目(タップの質感自体はwrapper側で変える)。 */
+.aquarium-scene__sparkle {
   position: absolute;
   inset: 0;
   border-radius: 50%;
@@ -201,11 +232,11 @@
   pointer-events: none;
 }
 
-.aquarium-scene__daikon-tap.is-tapped .aquarium-scene__daikon-sparkle {
-  animation: aquarium-daikon-tap-sparkle 400ms ease-out;
+.aquarium-scene__tap.is-tapped .aquarium-scene__sparkle {
+  animation: aquarium-tap-sparkle 400ms ease-out;
 }
 
-@keyframes aquarium-daikon-tap-sparkle {
+@keyframes aquarium-tap-sparkle {
   0% {
     opacity: 0;
   }
@@ -264,16 +295,17 @@
     animation: none !important;
   }
 
-  .aquarium-scene__daikon-tap.is-tapped {
-    /* 大きな移動・squash/stretchは止め、タップした事実だけ短く伝える。 */
+  .aquarium-scene__tap.is-tapped {
+    /* 大きな移動・squash/stretchは止め、タップした事実だけ短く伝える。
+       大根・ちくわ共通の土台クラスに対してまとめて無効化する。 */
     animation: none !important;
   }
 
-  .aquarium-scene__daikon-tap.is-tapped .aquarium-scene__daikon-sparkle {
-    animation: aquarium-daikon-tap-sparkle-reduced 300ms ease-out;
+  .aquarium-scene__tap.is-tapped .aquarium-scene__sparkle {
+    animation: aquarium-tap-sparkle-reduced 300ms ease-out;
   }
 
-  @keyframes aquarium-daikon-tap-sparkle-reduced {
+  @keyframes aquarium-tap-sparkle-reduced {
     0% {
       opacity: 0;
     }

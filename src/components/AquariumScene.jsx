@@ -1,10 +1,10 @@
-// UIコンポーネント: 水槽の背景と、その上に配置したキャラクター画像の描画のみを担当する。
+// UIコンポーネント: 水槽の背景・常時泡・キャラクター配置を担当する。
 // soakProgressに応じた大根の見た目変化はCSS変数経由でCSS側に委譲し、
 // このコンポーネント自体は状態計算を行わない。
-// 浮遊・泡・光ゆらぎ・タップ反応もCSSアニメーションのみで実現し、
-// 新規ゲームロジック・永続化は持たない(タップ状態は保存しない)。
-import { useRef, useState } from "react";
+// キャラクターの浮遊・タップ反応の共通実装はCharacterコンポーネントへ分離し、
+// ここではキャラクターごとの配置(asset・position・personality用クラス名)のみを渡す。
 import { getSoakVisualStyle } from "../presentation/soakVisual.js";
+import { Character } from "./Character.jsx";
 import "./AquariumScene.css";
 
 // public/ 配下の静的アセットはビルド時のbase pathを反映するため、
@@ -28,47 +28,7 @@ const BUBBLES = [
   { left: "50%", size: 3, duration: 9.3, delay: -6.4, rise: "-94vh", opacity: 0.22 },
 ];
 
-// タップ泡のオフセット・タイミングは固定配列(1タップあたり4個)。
-const TAP_BUBBLE_OFFSETS = [
-  { left: "-14%", size: 4, duration: 0.8 },
-  { left: "8%", size: 3, duration: 0.7 },
-  { left: "22%", size: 5, duration: 0.9 },
-  { left: "-2%", size: 3, duration: 0.75 },
-];
-
-// 連打してもDOM要素が無限に増えないための上限(1タップ4個 × 数タップ分)。
-const MAX_TAP_BUBBLES = 24;
-
 export function AquariumScene({ soakProgress }) {
-  const daikonTapRef = useRef(null);
-  const fleeDirRef = useRef(1);
-  const tapBubbleIdRef = useRef(0);
-  const [tapBubbles, setTapBubbles] = useState([]);
-
-  function handleTapDaikon() {
-    const el = daikonTapRef.current;
-    if (el) {
-      // 逃げる方向を毎回反転させ、単調にならないようにする。
-      fleeDirRef.current *= -1;
-      el.style.setProperty("--flee-dir", String(fleeDirRef.current));
-      // 連打時も毎回反応が最初から再生されるよう、クラスを一度外して
-      // reflowを強制してから付け直す(CSSアニメーション再起動の定石)。
-      el.classList.remove("is-tapped");
-      void el.offsetWidth;
-      el.classList.add("is-tapped");
-    }
-
-    const newBubbles = TAP_BUBBLE_OFFSETS.map((offset) => ({
-      id: tapBubbleIdRef.current++,
-      ...offset,
-    }));
-    setTapBubbles((prev) => [...prev, ...newBubbles].slice(-MAX_TAP_BUBBLES));
-  }
-
-  function handleTapBubbleEnd(id) {
-    setTapBubbles((prev) => prev.filter((bubble) => bubble.id !== id));
-  }
-
   return (
     <div className="aquarium-scene">
       <img
@@ -96,49 +56,24 @@ export function AquariumScene({ soakProgress }) {
         ))}
       </div>
 
-      <div className="aquarium-scene__daikon-float">
-        <button
-          type="button"
-          ref={daikonTapRef}
-          onClick={handleTapDaikon}
-          className="aquarium-scene__daikon-tap"
-          aria-label="大根キャラクター(タップすると反応します)"
-        >
-          <img
-            src={daikonImage}
-            alt="大根キャラクター"
-            className="aquarium-scene__character aquarium-scene__daikon"
-            style={getSoakVisualStyle(soakProgress)}
-            draggable={false}
-          />
-          <span className="aquarium-scene__daikon-sparkle" aria-hidden="true" />
-        </button>
+      {/* soak表現(dashiLevel由来)を持つのは今のところ大根のみ。
+          ちくわはまだsoak visualを持たないため imgStyle を渡さない。 */}
+      <Character
+        floatClassName="aquarium-scene__daikon-float"
+        tapClassName="aquarium-scene__daikon-tap"
+        image={daikonImage}
+        alt="大根キャラクター"
+        imgClassName="aquarium-scene__daikon"
+        imgStyle={getSoakVisualStyle(soakProgress)}
+      />
 
-        <div className="aquarium-scene__tap-bubbles" aria-hidden="true">
-          {tapBubbles.map((bubble) => (
-            <span
-              key={bubble.id}
-              className="aquarium-scene__tap-bubble"
-              style={{
-                left: bubble.left,
-                width: `${bubble.size}px`,
-                height: `${bubble.size}px`,
-                animationDuration: `${bubble.duration}s`,
-              }}
-              onAnimationEnd={() => handleTapBubbleEnd(bubble.id)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="aquarium-scene__chikuwa-float">
-        <img
-          src={chikuwaImage}
-          alt="ちくわキャラクター"
-          className="aquarium-scene__character aquarium-scene__chikuwa"
-          draggable={false}
-        />
-      </div>
+      <Character
+        floatClassName="aquarium-scene__chikuwa-float"
+        tapClassName="aquarium-scene__chikuwa-tap"
+        image={chikuwaImage}
+        alt="ちくわキャラクター"
+        imgClassName="aquarium-scene__chikuwa"
+      />
     </div>
   );
 }
