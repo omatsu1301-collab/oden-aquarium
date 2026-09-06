@@ -23,6 +23,17 @@
   left: 26%;
   top: 30%;
   height: 24%;
+  --soak-t: 0;
+  /* soakProgress(0-100 → --soak-tは0-1)に応じて、白っぽい入りたて状態から
+     艶のある黄金色の染み染み状態までを既存のPNG1枚+CSS filterだけで表現する。
+     焦げ/劣化に見えないよう、色相は変えず彩度・明度・コントラストのみを動かす。 */
+  filter:
+    grayscale(calc(0.72 - var(--soak-t) * 0.72))
+    saturate(calc(0.55 + var(--soak-t) * 0.75))
+    brightness(calc(1.22 - var(--soak-t) * 0.2))
+    contrast(calc(0.96 + var(--soak-t) * 0.1))
+    drop-shadow(0 14px 20px rgba(60, 35, 5, 0.28));
+  transition: filter 0.5s ease-out;
 }
 
 .aquarium-scene__chikuwa {
