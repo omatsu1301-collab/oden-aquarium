@@ -9,6 +9,8 @@ import { ShopScreen } from "./screens/ShopScreen.jsx";
 import { CareSheet } from "./screens/CareSheet.jsx";
 import { LettersSheet } from "./screens/LettersSheet.jsx";
 import { SettingsSheet } from "./screens/SettingsSheet.jsx";
+import { SpeciesDetailSheet } from "./screens/SpeciesDetailSheet.jsx";
+import { ShopItemDetailSheet } from "./screens/ShopItemDetailSheet.jsx";
 import { RecoveryScreen } from "./screens/RecoveryScreen.jsx";
 import { DebugPanel } from "./components/DebugPanel.jsx";
 import { initAudioOnFirstInteraction, applyAudioSettings } from "./audio/audioEngine.js";
@@ -115,10 +117,13 @@ export function AppShell() {
           />
         )}
         {tab === "catalog" && (
-          <CatalogScreen state={state} dispatch={store.dispatch} onGoToShop={() => changeTab("shop")} />
+          <CatalogScreen
+            state={state}
+            onOpenSpeciesDetail={(speciesId) => openPanel("species", speciesId)}
+          />
         )}
         {tab === "shop" && (
-          <ShopScreen state={state} dispatch={store.dispatch} openLetters={() => openPanel("letters")} />
+          <ShopScreen state={state} onOpenItemDetail={(itemId) => openPanel("shopItem", itemId)} />
         )}
         <BottomNav current={tab} onChange={changeTab} />
       </div>
@@ -149,6 +154,24 @@ export function AppShell() {
         state={state}
         dispatch={store.dispatch}
         onRestore={store.recoverFromBackup}
+      />
+      <SpeciesDetailSheet
+        open={panel?.kind === "species"}
+        onClose={closePanel}
+        speciesId={panel?.payload}
+        state={state}
+        dispatch={store.dispatch}
+        onGoToShop={() => {
+          closePanel();
+          window.setTimeout(() => changeTab("shop"), 0);
+        }}
+      />
+      <ShopItemDetailSheet
+        open={panel?.kind === "shopItem"}
+        onClose={closePanel}
+        itemId={panel?.payload}
+        state={state}
+        dispatch={store.dispatch}
       />
 
       {debugMode && <DebugPanel state={state} setDebugState={store.setDebugState} />}

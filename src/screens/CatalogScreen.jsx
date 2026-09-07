@@ -1,15 +1,14 @@
 // 図鑑画面(仕様6.3)。06-catalog-night.pngの夜の屋台・木棚を再現する。
+// 具材詳細はAppShellのpanel(history連携)経由で開く。未発見のヒントだけこの画面のローカルSheet。
 import { useState } from "react";
 import { NightBackdrop } from "../components/NightBackdrop.jsx";
 import { Bowl } from "../components/Bowl.jsx";
-import { SpeciesDetailSheet } from "./SpeciesDetailSheet.jsx";
 import { Sheet } from "../ui/Sheet.jsx";
 import { SPECIES_ORDER, getSpecies } from "../data/species.js";
 import { getDiscoveredSpeciesCount } from "../game/selectors.js";
 import "./CatalogScreen.css";
 
-export function CatalogScreen({ state, dispatch, onGoToShop }) {
-  const [openSpeciesId, setOpenSpeciesId] = useState(null);
+export function CatalogScreen({ state, onOpenSpeciesDetail }) {
   const [showUnknownHint, setShowUnknownHint] = useState(false);
 
   const discoveredCount = getDiscoveredSpeciesCount(state.catalog);
@@ -17,7 +16,7 @@ export function CatalogScreen({ state, dispatch, onGoToShop }) {
   function handleCardClick(speciesId) {
     const entry = state.catalog[speciesId];
     if (entry?.firstSeenAt != null) {
-      setOpenSpeciesId(speciesId);
+      onOpenSpeciesDetail(speciesId);
     } else {
       setShowUnknownHint(true);
     }
@@ -68,15 +67,6 @@ export function CatalogScreen({ state, dispatch, onGoToShop }) {
           <div className="catalog-screen__card catalog-screen__card--empty" aria-hidden="true" />
         </div>
       </div>
-
-      <SpeciesDetailSheet
-        open={openSpeciesId !== null}
-        onClose={() => setOpenSpeciesId(null)}
-        speciesId={openSpeciesId}
-        state={state}
-        dispatch={dispatch}
-        onGoToShop={onGoToShop}
-      />
 
       <Sheet open={showUnknownHint} onClose={() => setShowUnknownHint(false)} title="???">
         <p>まだ出会っていません。水槽で具材をすくうと記録されます。</p>

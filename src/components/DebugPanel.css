@@ -1,25 +1,61 @@
+/* 折りたたみ時: 右下の小さなトグルのみ。BottomNav/上部アイコンを一切覆わない。 */
+.debug-panel-toggle {
+  position: fixed;
+  right: 10px;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0));
+  z-index: 20;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(20, 15, 5, 0.75);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* 展開時: BottomNavの上に収まる高さに抑え、上部アイコンとも重ならないようにする。 */
 .debug-panel {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 10;
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(20, 15, 5, 0.88);
+  bottom: calc(64px + env(safe-area-inset-bottom, 0));
+  z-index: 20;
+  padding: 10px 16px;
+  background: rgba(20, 15, 5, 0.92);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   font-size: 0.75rem;
-  max-height: 40vh;
+  max-height: 42vh;
   overflow-y: auto;
+}
+
+.debug-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
 }
 
 .debug-panel__title {
   margin: 0;
   opacity: 0.7;
   font-size: 0.7rem;
+}
+
+.debug-panel__collapse {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.7rem;
+  cursor: pointer;
 }
 
 .debug-panel__row {

@@ -17,6 +17,8 @@
   justify-content: space-between;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+  /* NightBackdropの提灯(左上、幅15%・最大64px)と重ならないよう余白を空ける。 */
+  padding-left: max(15%, 64px);
 }
 
 .catalog-screen__title {
@@ -67,6 +69,10 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  /* grid/flexアイテムの既定min-width:autoは、aspect-ratioを持つ子要素(.bowl)があると
+     意図しない巨大サイズで確定することがあるため、明示的に上書きする。 */
+  width: 100%;
+  min-width: 0;
 }
 
 .catalog-screen__card--empty {

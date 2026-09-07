@@ -1,5 +1,8 @@
 // ?debug=1専用のデバッグパネル。本番保存とは別キー(useGameStore({debug:true}))で動作し、
 // 通常URLには出さない(仕様9)。時間送り・fixtureで検証を高速化する。
+// 既定は折りたたみ(小さなトグルのみ)にし、通常のUI(上部アイコン/下部ナビ)の操作を
+// 妨げないようにする。展開時のみ操作パネルを表示する。
+import { useState } from "react";
 import { advanceGame } from "../game/engine.js";
 import { SPECIES_ORDER } from "../data/species.js";
 import "./DebugPanel.css";
@@ -8,6 +11,8 @@ const MS_PER_MINUTE = 60 * 1000;
 const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 
 export function DebugPanel({ state, setDebugState }) {
+  const [expanded, setExpanded] = useState(false);
+
   function advanceBy(ms) {
     setDebugState(advanceGame(state, state.lastSimulatedAt + ms));
   }
@@ -39,9 +44,27 @@ export function DebugPanel({ state, setDebugState }) {
     setDebugState({ ...state, slots: state.slots.map((s) => (s.status === "growing" ? { ...s, progress: 100 } : s)) });
   }
 
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        className="debug-panel-toggle"
+        data-testid="debug-panel-toggle"
+        onClick={() => setExpanded(true)}
+      >
+        DEBUG
+      </button>
+    );
+  }
+
   return (
     <div className="debug-panel" data-testid="debug-panel">
-      <p className="debug-panel__title">DEBUG(専用保存・本番データ非汚染)</p>
+      <div className="debug-panel__header">
+        <p className="debug-panel__title">DEBUG(専用保存・本番データ非汚染)</p>
+        <button type="button" className="debug-panel__collapse" onClick={() => setExpanded(false)}>
+          閉じる
+        </button>
+      </div>
       <div className="debug-panel__row">
         <button type="button" onClick={() => advanceBy(10 * MS_PER_MINUTE)}>+10分</button>
         <button type="button" onClick={() => advanceBy(1 * MS_PER_HOUR)}>+1時間</button>

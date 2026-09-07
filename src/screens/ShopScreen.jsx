@@ -1,7 +1,7 @@
 // 商店画面(仕様6.4)。07-shop-night.pngの夜の道具屋・5売り場を再現する。
+// 商品詳細はAppShellのpanel(history連携)経由で開く。
 import { useState } from "react";
 import { NightBackdrop } from "../components/NightBackdrop.jsx";
-import { ShopItemDetailSheet } from "./ShopItemDetailSheet.jsx";
 import { SHOP_TABS, getShopTabItems } from "../data/shopCatalog.js";
 import "./ShopScreen.css";
 
@@ -38,9 +38,8 @@ function itemStatusLabel(item, state) {
   return null;
 }
 
-export function ShopScreen({ state, dispatch }) {
+export function ShopScreen({ state, onOpenItemDetail }) {
   const [activeTab, setActiveTab] = useState("broth");
-  const [openItemId, setOpenItemId] = useState(null);
 
   return (
     <div className="shop-screen">
@@ -80,7 +79,7 @@ export function ShopScreen({ state, dispatch }) {
                     key={item.id}
                     type="button"
                     className="shop-item-card"
-                    onClick={() => setOpenItemId(item.id)}
+                    onClick={() => onOpenItemDetail(item.id)}
                   >
                     <ShopItemIcon item={item} />
                     <span className="shop-item-card__name">{item.name}</span>
@@ -99,14 +98,6 @@ export function ShopScreen({ state, dispatch }) {
           </div>
         ))}
       </div>
-
-      <ShopItemDetailSheet
-        open={openItemId !== null}
-        onClose={() => setOpenItemId(null)}
-        itemId={openItemId}
-        state={state}
-        dispatch={dispatch}
-      />
     </div>
   );
 }
