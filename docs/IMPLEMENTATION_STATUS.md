@@ -205,7 +205,7 @@ verify:deriveすべて成功。PR #8作成→mainへ通常merge→deploy run #19
   横スクロールなし
 - `dist/assets/items/`に`broth-neutral.webp`を含む6点すべて確認、
   `references/*master*`のdistへの混入なしを確認
-- `git diff --stat origin/feature/tank-care-art-pass-1`で意図しない変更
+- `git diff --stat origin/main...HEAD`で意図しない変更
   (ゲーム/保存/成長色/キャラクター配置)がないことを確認済み
 
 ## スクリーンショットの場所
@@ -227,12 +227,35 @@ ce690091-7eb7-5a43-9562-f434e3c790e3/scratchpad/`)に保存。PRへの添付は�
 
 ラウンド1(参考、`art1-*.png`)は保持済み。
 
-## 未確認事項
+## 未確認事項(採用後も残る事項)
 
 - 実機スマートフォンでの確認(本セッションでは実施不可)
-- おたまアイコン・歯車アイコンの再設計版は、ユーザーの実画面確認による最終美術判断が必要
+- 昆布以外の出汁の専用イラストは今後の商店美術工程で検討(現状は無地陶器で代替、採用済み)
 
-## Draft PR
+## ユーザー採用記録
 
-https://github.com/omatsu1301-collab/oden-aquarium/pull/9 (Draft、merge・deploy未実施、
-ラウンド2の修正を追加commit済み)
+ユーザーがPR #9の内容を「採用」と明示。採用範囲は以下の通り(それ以外の機能・美術・
+ゲームバランスは今回変更しない)。
+
+- 水槽画面
+- お世話画面の360px・390px・430pxレイアウト
+- 昆布だし器(`broth-kombu.webp`)
+- 昆布以外に使用する共通無地陶器(`broth-neutral.webp`)
+- おたすけ4商品画像(`assist-drop.webp`/`assist-rich-drop.webp`/`assist-care.webp`/
+  `assist-long-care.webp`)
+- 再設計したおたま・歯車アイコン
+
+維持(変更しない)ことも明示的に確認済み:
+
+- がんもの成長色(`soakVisual`)
+- キャラクターの既存サイズ差(配置枠に起因するもの)
+- 正式な個体差システムは引き続き検討候補とし、今回は実装しない
+
+この採用を受け、PR #9をDraft→Ready→`main`へ通常mergeし、Pages deployの成功を
+確認する(下記参照)。
+
+## PR #9 クローズ結果
+
+- merge SHA: (下記コマンド実行後に追記)
+- deploy run: (下記コマンド実行後に追記)
+- 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
