@@ -1,0 +1,37 @@
+.shop-detail__tagline {
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3);
+}
+.shop-detail__effect {
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+.shop-detail__purchase {
+  margin-bottom: var(--space-2);
+}
+.shop-detail__owned-count {
+  font-size: var(--font-small);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+.shop-detail__shortfall {
+  color: var(--color-danger);
+  font-size: var(--font-small);
+  text-align: center;
+  margin-top: 6px;
+}
+.shop-detail__active-note {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+.shop-detail__bowl-targets-lead {
+  font-size: var(--font-small);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+.shop-detail__bowl-targets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}

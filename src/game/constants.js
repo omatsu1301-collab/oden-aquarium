@@ -17,6 +17,8 @@ export const MAX_TAP_BUBBLES = 24;
 export const LOCAL_STORAGE_KEY = "oden-aquarium/save";
 export const LOCAL_STORAGE_V1_BACKUP_KEY = "oden-aquarium/save-v1-backup";
 export const LOCAL_STORAGE_LEASE_KEY = "oden-aquarium/tab-lease";
+// ?debug=1 のfixture操作専用の保存キー。本番保存(LOCAL_STORAGE_KEY)とは完全に分離する。
+export const DEBUG_LOCAL_STORAGE_KEY = "oden-aquarium/debug-save";
 
 export const BACKUP_APP_ID = "oden-aquarium";
 export const BACKUP_FORMAT_VERSION = 2;

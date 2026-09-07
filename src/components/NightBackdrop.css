@@ -1,0 +1,103 @@
+.night-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    var(--night-ambient) 0%,
+    var(--night-shelf-dark) 32%,
+    var(--night-shelf) 60%,
+    var(--night-shelf-dark) 100%
+  );
+}
+
+.night-backdrop__shelf-texture {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 78px,
+    rgba(0, 0, 0, 0.22) 78px,
+    rgba(0, 0, 0, 0.22) 84px
+  );
+  opacity: 0.6;
+}
+
+.night-backdrop__window {
+  position: absolute;
+  top: 6%;
+  right: 6%;
+  width: 34%;
+  height: 16%;
+  background: var(--night-sky);
+  border-radius: 4px;
+  box-shadow: 0 0 0 6px var(--night-shelf-light);
+  overflow: hidden;
+}
+.night-backdrop__window-buildings {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to top, #14192b 0 40%, transparent 40%),
+    radial-gradient(circle 3px at 20% 30%, #ffe9a8, transparent 60%),
+    radial-gradient(circle 3px at 50% 20%, #ffe9a8, transparent 60%),
+    radial-gradient(circle 3px at 75% 35%, #ffe9a8, transparent 60%);
+}
+
+.night-backdrop__noren {
+  position: absolute;
+  top: 0;
+  left: 8%;
+  display: flex;
+  gap: 6px;
+}
+.night-backdrop__noren-panel {
+  width: 14px;
+  height: 15%;
+  min-height: 46px;
+  background: #26365f;
+  border-radius: 0 0 3px 3px;
+}
+
+.night-backdrop__lantern {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  width: 15%;
+  max-width: 64px;
+  aspect-ratio: 0.7;
+  border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(circle at 45% 35%, var(--night-lantern), #e6a94a 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px 6px rgba(255, 216, 138, 0.4);
+}
+.night-backdrop__lantern-glow {
+  position: absolute;
+  inset: -30%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 216, 138, 0.35), transparent 70%);
+  animation: night-lantern-pulse 3.2s ease-in-out infinite;
+}
+@keyframes night-lantern-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+.night-backdrop__lantern-text {
+  writing-mode: vertical-rl;
+  color: #6b2e1c;
+  font-weight: 800;
+  font-size: 11px;
+  z-index: 1;
+}
+
+:root[data-motion="reduced"] .night-backdrop__lantern-glow {
+  animation: none;
+}
