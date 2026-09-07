@@ -2,6 +2,8 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  /* 水槽をなぞっての連続収穫(仕様4.4)のための領域。スクロール阻害をここだけに限定する。 */
+  touch-action: none;
 }
 
 .aquarium-scene__background {
@@ -122,14 +124,11 @@
   display: block;
   height: 100%;
   width: auto;
-  filter: drop-shadow(0 14px 20px rgba(60, 35, 5, 0.28));
-}
-
-.aquarium-scene__daikon {
   --soak-t: 0;
-  /* soakProgress(0-100 → --soak-tは0-1)に応じて、白っぽい入りたて状態から
+  /* 育成の進み具合(0-100 → --soak-tは0-1)に応じて、白っぽい入りたて状態から
      艶のある黄金色の染み染み状態までを既存のPNG1枚+CSS filterだけで表現する。
-     焦げ/劣化に見えないよう、色相は変えず彩度・明度・コントラストのみを動かす。 */
+     焦げ/劣化に見えないよう、色相は変えず彩度・明度・コントラストのみを動かす。
+     全具材共通(以前は大根のみだったが、v2では全スロットが育成進捗を持つ)。 */
   filter:
     grayscale(calc(0.72 - var(--soak-t) * 0.72))
     saturate(calc(0.55 + var(--soak-t) * 0.75))
@@ -447,54 +446,275 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .aquarium-scene__background,
-  .aquarium-scene__daikon-float,
-  .aquarium-scene__chikuwa-float,
-  .aquarium-scene__shirataki-float,
-  .aquarium-scene__konnyaku-float,
-  .aquarium-scene__ganmo-float,
-  .aquarium-scene__bubble {
-    animation: none !important;
-  }
+/* 空き待ちスロット: 個体はまだいない。位置だけ保持し、小さな泡の気配だけを残す。 */
+.aquarium-scene__empty-hint {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.5), transparent 70%);
+  animation: aquarium-empty-hint-pulse 2.4s ease-in-out infinite;
+}
 
-  .aquarium-scene__tap.is-tapped {
-    /* 大きな移動・squash/stretchは止め、タップした事実だけ短く伝える。
-       大根・ちくわ共通の土台クラスに対してまとめて無効化する。 */
-    animation: none !important;
+@keyframes aquarium-empty-hint-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.9);
   }
-
-  .aquarium-scene__tap.is-tapped .aquarium-scene__sparkle {
-    animation: aquarium-tap-sparkle-reduced 300ms ease-out;
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
   }
+}
 
-  @keyframes aquarium-tap-sparkle-reduced {
-    0% {
-      opacity: 0;
-    }
-    30% {
-      opacity: 0.4;
-    }
-    100% {
-      opacity: 0;
-    }
+/* 6枠目(深い土鍋で拡張した時だけ使う追加位置)。他5体と重なりすぎない中央寄りの余白へ配置。 */
+.aquarium-scene__slot6-float {
+  position: absolute;
+  left: 36%;
+  top: 68%;
+  height: 13%;
+  transform-origin: 50% 55%;
+  animation: aquarium-float-slot6 5.4s ease-in-out infinite;
+  animation-delay: -2.1s;
+}
+
+@keyframes aquarium-float-slot6 {
+  0% {
+    transform: translate(0, 0) rotate(-1deg);
   }
-
-  /* タップ泡はonAnimationEndで自己削除するため、animation自体は
-     止めずに移動量だけ無くし、opacityフェードのみ残す。 */
-  .aquarium-scene__tap-bubble {
-    animation-name: aquarium-tap-bubble-fade-only;
+  35% {
+    transform: translate(-1.5%, -4%) rotate(1.5deg);
   }
+  70% {
+    transform: translate(1%, -6%) rotate(-1deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-1deg);
+  }
+}
 
-  @keyframes aquarium-tap-bubble-fade-only {
-    0% {
-      opacity: 0;
-    }
-    15% {
-      opacity: 0.6;
-    }
-    100% {
-      opacity: 0;
-    }
+.aquarium-scene__slot6-tap.is-tapped {
+  animation: aquarium-slot6-tap-react 400ms ease-out;
+}
+
+@keyframes aquarium-slot6-tap-react {
+  0% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.07, 0.92) translate(calc(var(--flee-dir) * -6px), -3px)
+      rotate(calc(var(--flee-dir) * -4deg));
+  }
+  65% {
+    transform: scale(0.95, 1.06) translate(calc(var(--flee-dir) * -3px), -6px)
+      rotate(calc(var(--flee-dir) * 2deg));
+  }
+  100% {
+    transform: scale(1, 1) translate(0, 0) rotate(0deg);
+  }
+}
+
+/* 成熟個体: 控えめなきらめきで「すくえます」を示す(仕様6.2)。 */
+.aquarium-scene__mature-glow {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 200, 0.5), transparent 70%);
+  animation: aquarium-mature-glow-pulse 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes aquarium-mature-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+/* 未成熟タップ時の短い名前/進行表示(仕様4.4)。 */
+.aquarium-scene__progress-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 250, 235, 0.9);
+  color: #6b4a1c;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: aquarium-hint-fade 1.2s ease-out forwards;
+}
+
+@keyframes aquarium-hint-fade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 収穫の残像演出: データは既に確定済みで、これは見た目だけの短い余韻。 */
+.aquarium-scene__afterimage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: aquarium-afterimage-rise 650ms ease-out forwards;
+}
+
+.aquarium-scene__afterimage img {
+  height: 100%;
+  width: auto;
+  filter: drop-shadow(0 14px 20px rgba(60, 35, 5, 0.28)) brightness(1.15);
+}
+
+.aquarium-scene__afterimage-points {
+  position: absolute;
+  top: -10%;
+  color: #fff3d6;
+  font-weight: 700;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(60, 35, 5, 0.6);
+}
+
+@keyframes aquarium-afterimage-rise {
+  0% {
+    opacity: 0.9;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40%) scale(0.7);
+  }
+}
+
+/* 水槽左下の景観枠(仕様5.5)。能力なし、見た目のみ。1点だけ配置できる。 */
+.aquarium-scene__decoration {
+  position: absolute;
+  left: 4%;
+  bottom: 6%;
+  width: 15%;
+  height: 12%;
+  pointer-events: none;
+}
+
+.aquarium-scene__decoration--pebble {
+  background: radial-gradient(ellipse at 40% 60%, #8a7256, #5b4a35 75%);
+  border-radius: 50% 50% 45% 45%;
+  opacity: 0.9;
+}
+
+.aquarium-scene__decoration--kelp {
+  background:
+    linear-gradient(10deg, transparent 40%, #3f5a2c 40% 46%, transparent 46%),
+    linear-gradient(-8deg, transparent 30%, #4a6a34 30% 37%, transparent 37%),
+    linear-gradient(14deg, transparent 55%, #35502a 55% 60%, transparent 60%);
+  animation: aquarium-kelp-sway 6s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes aquarium-kelp-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+.aquarium-scene__decoration--hideout {
+  background: radial-gradient(circle at 50% 40%, #b98a55, #7a5330 70%);
+  border-radius: 50% 50% 40% 40%;
+}
+.aquarium-scene__decoration--hideout::after {
+  content: "";
+  position: absolute;
+  left: 35%;
+  top: 30%;
+  width: 30%;
+  height: 40%;
+  border-radius: 50%;
+  background: #2c1c10;
+}
+
+.aquarium-scene__decoration--lantern {
+  background: radial-gradient(circle at 50% 45%, rgba(255, 244, 200, 0.9), rgba(255, 200, 110, 0.25) 65%, transparent 80%);
+  animation: aquarium-mature-glow-pulse 3s ease-in-out infinite;
+}
+
+/* 「動きを控えめに」(設定画面)は、初回のみOS設定(prefers-reduced-motion)に合わせて
+   初期化し、以後はユーザーの保存設定だけに従う(仕様6.8)。そのためCSSのmedia queryには
+   依存せず、AppShellがdocumentElementへ付与する data-motion="reduced" だけを見る。 */
+:root[data-motion="reduced"] .aquarium-scene__background,
+:root[data-motion="reduced"] .aquarium-scene__daikon-float,
+:root[data-motion="reduced"] .aquarium-scene__chikuwa-float,
+:root[data-motion="reduced"] .aquarium-scene__shirataki-float,
+:root[data-motion="reduced"] .aquarium-scene__konnyaku-float,
+:root[data-motion="reduced"] .aquarium-scene__ganmo-float,
+:root[data-motion="reduced"] .aquarium-scene__slot6-float,
+:root[data-motion="reduced"] .aquarium-scene__decoration--kelp,
+:root[data-motion="reduced"] .aquarium-scene__decoration--lantern,
+:root[data-motion="reduced"] .aquarium-scene__mature-glow,
+:root[data-motion="reduced"] .aquarium-scene__empty-hint,
+:root[data-motion="reduced"] .aquarium-scene__bubble {
+  animation: none !important;
+}
+
+/* 大きな移動・squash/stretchは止め、タップした事実だけ短く伝える。 */
+:root[data-motion="reduced"] .aquarium-scene__tap.is-tapped {
+  animation: none !important;
+}
+
+:root[data-motion="reduced"] .aquarium-scene__tap.is-tapped .aquarium-scene__sparkle {
+  animation: aquarium-tap-sparkle-reduced 300ms ease-out;
+}
+
+@keyframes aquarium-tap-sparkle-reduced {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* タップ泡はonAnimationEndで自己削除するため、animation自体は
+   止めずに移動量だけ無くし、opacityフェードのみ残す。 */
+:root[data-motion="reduced"] .aquarium-scene__tap-bubble {
+  animation-name: aquarium-tap-bubble-fade-only;
+}
+
+@keyframes aquarium-tap-bubble-fade-only {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
   }
 }

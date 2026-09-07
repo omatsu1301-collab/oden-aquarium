@@ -1,0 +1,101 @@
+.catalog-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.catalog-screen__content {
+  position: relative;
+  z-index: 1;
+  padding: calc(env(safe-area-inset-top, 0) + var(--space-4)) var(--space-4) var(--space-5);
+}
+
+.catalog-screen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  /* NightBackdropの提灯(左上、幅15%・最大64px)と重ならないよう余白を空ける。 */
+  padding-left: max(15%, 64px);
+}
+
+.catalog-screen__title {
+  margin: 0;
+  font-size: var(--font-title);
+  font-weight: 800;
+  color: var(--night-text);
+}
+
+.catalog-screen__subtitle {
+  margin: 2px 0 0;
+  font-size: var(--font-small);
+  color: var(--night-text-muted);
+}
+
+.catalog-screen__count {
+  background: rgba(20, 12, 4, 0.55);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.catalog-screen__count-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--night-text);
+}
+.catalog-screen__count-label {
+  display: block;
+  font-size: 10px;
+  color: var(--night-text-muted);
+}
+
+.catalog-screen__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.catalog-screen__card {
+  position: relative;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  /* grid/flexアイテムの既定min-width:autoは、aspect-ratioを持つ子要素(.bowl)があると
+     意図しない巨大サイズで確定することがあるため、明示的に上書きする。 */
+  width: 100%;
+  min-width: 0;
+}
+
+.catalog-screen__card--empty {
+  cursor: default;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.catalog-screen__card-label {
+  font-size: var(--font-small);
+  font-weight: 700;
+  color: var(--night-text);
+  background: rgba(20, 12, 4, 0.5);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.catalog-screen__favorite {
+  position: absolute;
+  top: 2px;
+  right: 14%;
+  color: #ff8f7a;
+  font-size: 16px;
+}

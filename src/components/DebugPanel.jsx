@@ -1,55 +1,99 @@
-// デバッグ用UI: `?debug=1` が付いたURLでのみ表示される。
-// 本番ユーザーには見えない、時間送り操作とsoakProgress強制表示を提供する。
-import { MS_PER_HOUR } from "../constants.js";
+// ?debug=1専用のデバッグパネル。本番保存とは別キー(useGameStore({debug:true}))で動作し、
+// 通常URLには出さない(仕様9)。時間送り・fixtureで検証を高速化する。
+// 既定は折りたたみ(小さなトグルのみ)にし、通常のUI(上部アイコン/下部ナビ)の操作を
+// 妨げないようにする。展開時のみ操作パネルを表示する。
+import { useState } from "react";
+import { advanceGame } from "../game/engine.js";
+import { SPECIES_ORDER } from "../data/species.js";
 import "./DebugPanel.css";
 
-const ADVANCE_OPTIONS_HOURS = [1, 6, 24];
-const SOAK_PREVIEW_OPTIONS = [0, 50, 100];
+const MS_PER_MINUTE = 60 * 1000;
+const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 
-export function DebugPanel({ onAdvanceHours, soakOverride, onSetSoakOverride }) {
+export function DebugPanel({ state, setDebugState }) {
+  const [expanded, setExpanded] = useState(false);
+
+  function advanceBy(ms) {
+    setDebugState(advanceGame(state, state.lastSimulatedAt + ms));
+  }
+
+  function addWallet(amount) {
+    setDebugState({ ...state, wallet: state.wallet + amount });
+  }
+
+  function emptyBroth() {
+    setDebugState({ ...state, tank: { ...state.tank, remainingRatio: 0 } });
+  }
+
+  function discoverAll() {
+    const nowMs = Date.now();
+    const catalog = { ...state.catalog };
+    for (const speciesId of SPECIES_ORDER) {
+      catalog[speciesId] = catalog[speciesId] ?? {
+        firstSeenAt: nowMs,
+        harvestCount: 1,
+        favorite: false,
+        bowlId: "bowl-white",
+        brothCounts: { [state.tank.brothId]: 1 },
+      };
+    }
+    setDebugState({ ...state, catalog, stats: { ...state.stats, harvestTotal: Math.max(state.stats.harvestTotal, 5) } });
+  }
+
+  function matureAll() {
+    setDebugState({ ...state, slots: state.slots.map((s) => (s.status === "growing" ? { ...s, progress: 100 } : s)) });
+  }
+
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        className="debug-panel-toggle"
+        data-testid="debug-panel-toggle"
+        onClick={() => setExpanded(true)}
+      >
+        DEBUG
+      </button>
+    );
+  }
+
   return (
-    <div className="debug-panel">
-      <div className="debug-panel__section">
-        <div className="debug-panel__label">デバッグ: 時間を進める</div>
-        <div className="debug-panel__buttons">
-          {ADVANCE_OPTIONS_HOURS.map((hours) => (
-            <button
-              key={hours}
-              type="button"
-              className="debug-panel__button"
-              onClick={() => onAdvanceHours(hours * MS_PER_HOUR)}
-            >
-              +{hours}時間
-            </button>
-          ))}
-        </div>
+    <div className="debug-panel" data-testid="debug-panel">
+      <div className="debug-panel__header">
+        <p className="debug-panel__title">DEBUG(専用保存・本番データ非汚染)</p>
+        <button type="button" className="debug-panel__collapse" onClick={() => setExpanded(false)}>
+          閉じる
+        </button>
       </div>
-      <div className="debug-panel__section">
-        <div className="debug-panel__label">
-          デバッグ: soakProgress強制表示(保存には影響しません)
-        </div>
-        <div className="debug-panel__buttons">
-          {SOAK_PREVIEW_OPTIONS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              className="debug-panel__button"
-              aria-pressed={soakOverride === value}
-              onClick={() => onSetSoakOverride(value)}
-            >
-              {value}%
-            </button>
-          ))}
-          <button
-            type="button"
-            className="debug-panel__button"
-            disabled={soakOverride === null}
-            onClick={() => onSetSoakOverride(null)}
-          >
-            実際の値に戻す
-          </button>
-        </div>
+      <div className="debug-panel__row">
+        <button type="button" onClick={() => advanceBy(10 * MS_PER_MINUTE)}>+10分</button>
+        <button type="button" onClick={() => advanceBy(1 * MS_PER_HOUR)}>+1時間</button>
+        <button type="button" onClick={() => advanceBy(8 * MS_PER_HOUR)}>+8時間</button>
+        <button type="button" onClick={() => advanceBy(24 * MS_PER_HOUR)}>+24時間</button>
       </div>
+      <div className="debug-panel__row">
+        <button type="button" onClick={() => addWallet(1000)}>+1000pt</button>
+        <button type="button" onClick={emptyBroth}>出汁を空に</button>
+        <button type="button" onClick={discoverAll}>全種類発見済みに</button>
+        <button type="button" onClick={matureAll}>全スロット成熟</button>
+      </div>
+      <pre className="debug-panel__state">
+        {JSON.stringify(
+          {
+            wallet: state.wallet,
+            remainingRatio: Number(state.tank.remainingRatio.toFixed(3)),
+            brothId: state.tank.brothId,
+            potId: state.tank.potId,
+            slots: state.slots.map((s) =>
+              s.status === "growing"
+                ? { speciesId: s.speciesId, progress: Math.round(s.progress) }
+                : { status: "empty-waiting" },
+            ),
+          },
+          null,
+          0,
+        )}
+      </pre>
     </div>
   );
 }

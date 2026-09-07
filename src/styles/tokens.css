@@ -1,0 +1,43 @@
+/* 実装用CSS変数(色/余白/角丸/影)を集約する(仕様6.1)。 */
+:root {
+  --color-surface: #fbf2df;
+  --color-surface-strong: #fffaf0;
+  --color-text: #4a3018;
+  --color-text-muted: #8a6a44;
+  --color-accent: #f2c14e;
+  --color-accent-strong: #dfa62b;
+  --color-accent-contrast: #4a2f12;
+  --color-border: rgba(74, 48, 24, 0.14);
+  --color-danger: #b5482f;
+
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --shadow-sheet: 0 -10px 28px rgba(60, 35, 5, 0.22);
+  --shadow-card: 0 6px 16px rgba(60, 35, 5, 0.14);
+  --shadow-float: 0 3px 10px rgba(60, 35, 5, 0.16);
+
+  --font-body: 15px;
+  --font-small: 12.5px;
+  --font-title: 22px;
+  --tap-min: 44px;
+
+  /* 夜(図鑑/商店)テーマ */
+  --night-ambient: #1c1208;
+  --night-sky: #262f4a;
+  --night-shelf: #6b4423;
+  --night-shelf-dark: #432a15;
+  --night-shelf-light: #8a5c34;
+  --night-lantern: #ffd88a;
+  --night-text: #fdf1de;
+  --night-text-muted: #d9c3a0;
+}

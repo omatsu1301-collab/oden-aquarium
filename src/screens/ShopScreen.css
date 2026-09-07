@@ -1,0 +1,116 @@
+.shop-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.shop-screen__content {
+  position: relative;
+  z-index: 1;
+  padding: calc(env(safe-area-inset-top, 0) + var(--space-4)) var(--space-4) var(--space-5);
+}
+
+.shop-screen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  /* NightBackdropの提灯(左上、幅15%・最大64px)と重ならないよう余白を空ける。 */
+  padding-left: max(15%, 64px);
+}
+.shop-screen__title {
+  margin: 0;
+  font-size: var(--font-title);
+  font-weight: 800;
+  color: var(--night-text);
+}
+.shop-screen__subtitle {
+  margin: 2px 0 0;
+  font-size: var(--font-small);
+  color: var(--night-text-muted);
+}
+.shop-screen__wallet {
+  flex-shrink: 0;
+  background: rgba(20, 12, 4, 0.55);
+  color: #ffd88a;
+  font-weight: 800;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-small);
+}
+
+.shop-screen__tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: var(--space-3);
+  padding-bottom: 2px;
+}
+.shop-screen__tab {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 250, 235, 0.14);
+  color: var(--night-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+.shop-screen__tab.is-active {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.shop-screen__lead {
+  color: var(--night-text-muted);
+  font-size: var(--font-small);
+  margin: 0 0 var(--space-3);
+}
+
+.shop-screen__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.shop-item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: rgba(255, 250, 235, 0.92);
+  cursor: pointer;
+  text-align: center;
+}
+.shop-item-card__icon {
+  font-size: 30px;
+}
+.shop-item-card__name {
+  font-weight: 800;
+  font-size: var(--font-body);
+  color: var(--color-text);
+}
+.shop-item-card__tagline {
+  font-size: 10.5px;
+  color: var(--color-text-muted);
+  min-height: 2.4em;
+}
+.shop-item-card__price {
+  font-weight: 700;
+  color: var(--color-accent-strong);
+  font-size: var(--font-small);
+}
+.shop-item-card__status {
+  font-size: var(--font-small);
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+.shop-item-card__status.is-active {
+  color: var(--color-accent-strong);
+}
