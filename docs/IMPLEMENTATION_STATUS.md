@@ -256,6 +256,10 @@ ce690091-7eb7-5a43-9562-f434e3c790e3/scratchpad/`)に保存。PRへの添付は�
 
 ## PR #9 クローズ結果
 
-- merge SHA: (下記コマンド実行後に追記)
-- deploy run: (下記コマンド実行後に追記)
+- 状態: merged、Pages deploy成功。**美術改善パス1は完了。**
+- merge SHA: `e660c61f4f792dde995ef42558de021adc1be73c`
+- deploy run: #22 (id `34123570326`)、conclusion: `success`
+  (https://github.com/omatsu1301-collab/oden-aquarium/actions/runs/34123570326)
 - 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
+  (本セッションのネットワークポリシー上、直接到達確認は不可。Actions成功のみ確認)
+- 未確認事項: 実機スマートフォンでの確認(本セッションでは実施不可)
