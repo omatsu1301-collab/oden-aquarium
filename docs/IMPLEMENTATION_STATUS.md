@@ -202,4 +202,4 @@ ce690091-7eb7-5a43-9562-f434e3c790e3/scratchpad/`)に保存。PRへの添付は�
 
 ## Draft PR
 
-作成後にURLを追記する。
+https://github.com/omatsu1301-collab/oden-aquarium/pull/9 (Draft、merge・deploy未実施)
