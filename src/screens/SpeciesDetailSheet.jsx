@@ -80,17 +80,19 @@ export function SpeciesDetailSheet({ open, onClose, speciesId, state, dispatch, 
         <div className="species-detail__bowl-picker">
           {BOWL_DECORATION_ORDER.map((bowlId) => {
             const owned = state.inventory.ownedIds.includes(bowlId);
+            const selected = bowlId === entry.bowlId;
             const decoration = getDecoration(bowlId);
             return (
               <button
                 key={bowlId}
                 type="button"
-                className="species-detail__bowl-option"
+                className={`species-detail__bowl-option${selected ? " is-selected" : ""}`}
                 disabled={!owned}
+                aria-pressed={selected}
                 onClick={() => (owned ? chooseBowl(bowlId) : onGoToShop?.())}
               >
                 <Bowl speciesId={speciesId} speciesName={species.name} bowlId={bowlId} discovered />
-                <span>{owned ? decoration.name : "商店へ"}</span>
+                <span>{selected ? `${decoration.name} ✓` : owned ? decoration.name : "商店へ"}</span>
               </button>
             );
           })}

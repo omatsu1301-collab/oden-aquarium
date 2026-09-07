@@ -1,0 +1,20 @@
+.catalog-night-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  /* 背景画像(852x1847)の下端の木色に近い延長色。画像より長いコンテンツでも
+     棚が不自然に反復せず、自然な木色で下まで続く。 */
+  background-color: #4a2410;
+}
+
+.catalog-night-backdrop__image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}

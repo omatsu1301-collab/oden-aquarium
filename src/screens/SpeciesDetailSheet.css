@@ -41,7 +41,7 @@
 .species-detail__dye-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+  gap: var(--space-2) 6px;
 }
 .species-detail__dye {
   display: flex;
@@ -49,6 +49,7 @@
   align-items: center;
   gap: 4px;
   opacity: 0.55;
+  min-width: 0;
 }
 .species-detail__dye.is-recorded {
   opacity: 1;
@@ -56,6 +57,7 @@
 .species-detail__dye-swatch {
   width: 32px;
   height: 32px;
+  flex-shrink: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -67,6 +69,10 @@
 .species-detail__dye-name {
   font-size: 10.5px;
   text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .species-detail__dye-count {
   font-size: 10px;
@@ -76,21 +82,42 @@
 .species-detail__bowl-picker {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-2);
+  gap: var(--space-2) 6px;
 }
 .species-detail__bowl-option {
   border: none;
   background: transparent;
+  border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  padding: 4px;
   font-size: 10.5px;
   cursor: pointer;
   color: var(--color-text);
+  min-width: 0;
 }
 .species-detail__bowl-option:disabled {
   opacity: 0.5;
+}
+.species-detail__bowl-option:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+}
+.species-detail__bowl-option.is-selected {
+  background: rgba(223, 166, 43, 0.16);
+  box-shadow: inset 0 0 0 2px var(--color-accent-strong);
+}
+.species-detail__bowl-option.is-selected span {
+  font-weight: 800;
+  color: var(--color-accent-contrast);
+}
+.species-detail__bowl-option span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .species-detail__favorite-btn {
