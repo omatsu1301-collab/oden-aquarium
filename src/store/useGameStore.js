@@ -1,7 +1,7 @@
 // ゲーム状態の中心ストア。読み込み・書き込み・複数タブ同期・表示用の1秒ティックを担当する。
 // reducer本体(advanceGame/applyAction)はReactに依存しない純粋関数のまま(src/game/)。
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadGameState, saveGameState } from "../storage/persistence.js";
+import { loadGameState, saveGameState, peekStoredRevision } from "../storage/persistence.js";
 import { validateGameState } from "../game/validate.js";
 import { advanceGame } from "../game/engine.js";
 import { applyAction } from "../game/actions.js";
@@ -67,9 +67,15 @@ export function useGameStore({ debug = false } = {}) {
 
   useEffect(() => {
     function flush() {
-      if (stateRef.current) {
-        saveGameState(advanceGame(stateRef.current, Date.now()), storageKey);
+      if (!stateRef.current) return;
+      const settled = advanceGame(stateRef.current, Date.now());
+      // 破損データ、あるいは他タブがこの後書き込んだより新しいrevisionを
+      // 無条件に上書きしない(仕様7.3)。read-modify-writeだけを原子的とは扱わない。
+      const stored = peekStoredRevision(storageKey);
+      if (stored.exists && (stored.revision === null || stored.revision > settled.revision)) {
+        return;
       }
+      saveGameState(settled, storageKey);
     }
     function onVisibilityChange() {
       if (document.visibilityState === "hidden") flush();

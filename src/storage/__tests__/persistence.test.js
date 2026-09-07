@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { loadGameState, saveGameState } from "../persistence.js";
+import { loadGameState, saveGameState, peekStoredRevision } from "../persistence.js";
 import { LOCAL_STORAGE_KEY, LOCAL_STORAGE_V1_BACKUP_KEY } from "../../game/constants.js";
 import { createInitialCharacterState } from "../../logic/derive.js";
 
@@ -63,5 +63,24 @@ describe("loadGameState", () => {
     const second = loadGameState(T0 + 1000);
     expect(second.status).toBe("ok");
     expect(second.data.wallet).toBe(12345);
+  });
+});
+
+describe("peekStoredRevision", () => {
+  it("キーが存在しない場合はexists:falseを返す", () => {
+    expect(peekStoredRevision(LOCAL_STORAGE_KEY)).toEqual({ exists: false, revision: null });
+  });
+
+  it("正常なv2データのrevisionを書き換えずに返す", () => {
+    const first = loadGameState(T0);
+    saveGameState({ ...first.data, revision: 7 });
+    expect(peekStoredRevision(LOCAL_STORAGE_KEY)).toEqual({ exists: true, revision: 7 });
+    // 覗き見るだけで内容を変えていないことを確認する。
+    expect(JSON.parse(window.localStorage.getItem(LOCAL_STORAGE_KEY)).revision).toBe(7);
+  });
+
+  it("壊れたJSONはexists:true, revision:nullを返す(上書きしてはいけない合図)", () => {
+    window.localStorage.setItem(LOCAL_STORAGE_KEY, "{ broken");
+    expect(peekStoredRevision(LOCAL_STORAGE_KEY)).toEqual({ exists: true, revision: null });
   });
 });

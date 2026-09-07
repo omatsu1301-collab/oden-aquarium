@@ -83,6 +83,23 @@ export function saveGameState(state, storageKey = LOCAL_STORAGE_KEY) {
   return writeRaw(storageKey, JSON.stringify(state));
 }
 
+// 現在保存されている内容を書き換えずにrevisionだけ覗き見る。
+// pagehide/visibilitychangeでの保存が、破損データや他タブのより新しい書き込みを
+// 無条件に上書きしないためのガードに使う(仕様7.3)。
+export function peekStoredRevision(storageKey = LOCAL_STORAGE_KEY) {
+  const raw = readRaw(storageKey);
+  if (typeof raw !== "string") return { exists: false, revision: null };
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && typeof parsed.revision === "number") {
+      return { exists: true, revision: parsed.revision };
+    }
+  } catch {
+    // 読み取れない = 破損している可能性。exists:trueかつrevision:nullで返す。
+  }
+  return { exists: true, revision: null };
+}
+
 // 復元(バックアップ/インポート)専用: 検証済み状態をそのまま置き換える。
 // 置換前に必ず現在の状態の退避に成功していることを呼び出し側が保証する。
 export function overwriteGameState(state, storageKey = LOCAL_STORAGE_KEY) {
