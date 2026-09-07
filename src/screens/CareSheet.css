@@ -11,8 +11,9 @@
   background: var(--color-surface-strong);
 }
 
-/* 360pxでは三列を無理に詰め込まず、器+情報の二列にし、補充ボタンを次の行へ回す。 */
-@media (max-width: 374px) {
+/* 360px・390pxでは三列を無理に詰め込まず、器+情報の二列にし、補充ボタンを次の行(全幅)へ
+   回す。430pxでは横一列を維持する(仕様6章: 390pxでの縦分断を修正)。 */
+@media (max-width: 409px) {
   .care-sheet__broth {
     grid-template-columns: auto 1fr;
     grid-template-areas:
@@ -30,6 +31,12 @@
   width: 132px;
   height: 132px;
   flex-shrink: 0;
+}
+@media (max-width: 409px) {
+  .care-sheet__vessel-slot {
+    width: 124px;
+    height: 124px;
+  }
 }
 @media (max-width: 374px) {
   .care-sheet__vessel-slot {

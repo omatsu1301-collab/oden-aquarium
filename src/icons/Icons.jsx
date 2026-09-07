@@ -10,9 +10,18 @@ const BASE_PROPS = {
   strokeLinejoin: "round",
 };
 
-function Icon({ children, className, size = 20 }) {
+// aria-hidden等、呼び出し側からのpropsを実際のsvg要素へ引き継ぐ。
+// styleは呼び出し側の指定とマージしつつ、pointerEvents:noneは必ず維持する。
+function Icon({ children, className, size = 20, style, ...svgProps }) {
   return (
-    <svg {...BASE_PROPS} width={size} height={size} className={className} style={{ pointerEvents: "none" }}>
+    <svg
+      {...BASE_PROPS}
+      width={size}
+      height={size}
+      className={className}
+      style={{ ...style, pointerEvents: "none" }}
+      {...svgProps}
+    >
       {children}
     </svg>
   );
@@ -43,8 +52,10 @@ export function EnvelopeIcon(props) {
 export function GearIcon(props) {
   return (
     <Icon {...props}>
-      <circle cx="12" cy="12" r="3.2" />
-      <path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M17.6 6.4l-1.55 1.55M7.95 16.05 6.4 17.6M17.6 17.6l-1.55-1.55M7.95 7.95 6.4 6.4" />
+      {/* 太陽(光条)と混同しないよう、歯が輪に接する短い凹凸+中心穴の歯車にする。 */}
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+      <path d="M12 3.8v2.2M12 18v2.2M20.2 12h-2.2M6 12H3.8M17.8 6.2l-1.56 1.56M7.76 16.24l-1.56 1.56M17.8 17.8l-1.56-1.56M7.76 7.76 6.2 6.2" />
     </Icon>
   );
 }
@@ -63,10 +74,11 @@ export function SparkleIcon(props) {
 export function LadleIcon(props) {
   return (
     <Icon {...props}>
-      {/* 虫眼鏡と混同しないよう、楕円の受け皿(上から見た形)+柄+吊り下げ穴で構成する。 */}
-      <ellipse cx="9" cy="13.2" rx="6" ry="4" />
-      <path d="M14.4 11.6 19.6 8.2" />
-      <circle cx="20.6" cy="7.5" r="1.3" />
+      {/* 鍵・虫眼鏡・スプーンと混同しないよう、浅いD字の受け皿(直線の縁+丸い底)+
+          斜めに長く伸びる柄で構成する。柄先に独立した丸(穴)は付けない。 */}
+      <path d="M3.6 11.6c0 3 2.9 4.3 6.4 4.3s6.4-1.3 6.4-4.3" />
+      <path d="M3.6 11.6h12.8" />
+      <path d="M14.3 10.4 20.8 4" />
     </Icon>
   );
 }
