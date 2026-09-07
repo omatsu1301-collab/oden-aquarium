@@ -1,6 +1,7 @@
 // 共通Sheet(下からせり上がるパネル)。仕様6.1:
 // role=dialog/aria-modal、フォーカス移動と復帰、見出し/閉じるを固定し内容のみスクロール。
 import { useEffect, useRef } from "react";
+import { CloseIcon } from "../icons/Icons.jsx";
 import "./Sheet.css";
 
 export function Sheet({ open, onClose, title, icon, headerExtra, children, labelledBy }) {
@@ -52,7 +53,7 @@ export function Sheet({ open, onClose, title, icon, headerExtra, children, label
             onClick={onClose}
             aria-label="閉じる"
           >
-            ×
+            <CloseIcon aria-hidden="true" />
           </button>
         </div>
         <div className="sheet__content">{children}</div>
