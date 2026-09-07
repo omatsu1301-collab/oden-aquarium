@@ -81,10 +81,6 @@ export function AppShell() {
     window.history.back();
   }
 
-  if (store.status === "loading" || !store.state) {
-    return <div className="app-shell__loading" aria-hidden="true" />;
-  }
-
   if (store.status === "corrupt") {
     return (
       <RecoveryScreen
@@ -93,6 +89,10 @@ export function AppShell() {
         onStartFresh={store.startFresh}
       />
     );
+  }
+
+  if (store.status === "loading" || !store.state) {
+    return <div className="app-shell__loading" aria-hidden="true" />;
   }
 
   const state = store.state;
