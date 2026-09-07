@@ -158,3 +158,53 @@ describe("お願い(quest)", () => {
     expect(again.wallet).toBe(claimed.wallet);
   });
 });
+
+describe("道具・飾り", () => {
+  function withOwned(state, ids) {
+    return { ...state, wallet: 5000, inventory: { ...state.inventory, ownedIds: [...state.inventory.ownedIds, ...ids] } };
+  }
+
+  it("ふたは1つだけ装備でき、別のふたに切り替えると前のふたは外れる", () => {
+    let state = withOwned(createInitialGameState(T0, 1), ["lid-wood", "lid-ceramic"]);
+    state = applyAction(state, { type: "SET_TOOL", toolId: "lid-wood", slotType: "lid" }, T0);
+    expect(state.tank.tools.lid).toBe("lid-wood");
+    state = applyAction(state, { type: "SET_TOOL", toolId: "lid-ceramic", slotType: "lid" }, T0);
+    expect(state.tank.tools.lid).toBe("lid-ceramic");
+  });
+
+  it("未所持の道具は装備できない", () => {
+    const state = createInitialGameState(T0, 1);
+    const next = applyAction(state, { type: "SET_TOOL", toolId: "paddle", slotType: "paddle" }, T0);
+    expect(next.tank.tools.paddle).toBe(false);
+  });
+
+  it("出汁まわし(paddle)は外すこともできる", () => {
+    let state = withOwned(createInitialGameState(T0, 1), ["paddle"]);
+    state = applyAction(state, { type: "SET_TOOL", toolId: "paddle", slotType: "paddle" }, T0);
+    expect(state.tank.tools.paddle).toBe(true);
+    state = applyAction(state, { type: "SET_TOOL", toolId: null, slotType: "paddle" }, T0);
+    expect(state.tank.tools.paddle).toBe(false);
+  });
+
+  it("水槽の飾りは1点のみ、未所持は装備できない", () => {
+    let state = withOwned(createInitialGameState(T0, 1), ["pebble"]);
+    const deniedForUnowned = applyAction(state, { type: "APPLY_DECORATION", decorationId: "kelp" }, T0);
+    expect(deniedForUnowned.tank.decorationId).toBe(null);
+    state = applyAction(state, { type: "APPLY_DECORATION", decorationId: "pebble" }, T0);
+    expect(state.tank.decorationId).toBe("pebble");
+    state = applyAction(state, { type: "APPLY_DECORATION", decorationId: null }, T0);
+    expect(state.tank.decorationId).toBe(null);
+  });
+
+  it("図鑑の器は発見済み種類にのみ適用でき、白以外を適用するとcustomBowlAppliedが立つ", () => {
+    let state = withOwned(createInitialGameState(T0, 1), ["bowl-indigo"]);
+    // まだ未発見なので適用できない
+    const beforeDiscovery = applyAction(state, { type: "APPLY_BOWL", speciesId: "daikon", bowlId: "bowl-indigo" }, T0);
+    expect(beforeDiscovery.catalog.daikon).toBeUndefined();
+
+    state = applyAction(state, { type: "HARVEST", instanceId: 1 }, T0); // daikonを収穫して発見
+    state = applyAction(state, { type: "APPLY_BOWL", speciesId: "daikon", bowlId: "bowl-indigo" }, T0);
+    expect(state.catalog.daikon.bowlId).toBe("bowl-indigo");
+    expect(state.stats.customBowlApplied).toBe(true);
+  });
+});
