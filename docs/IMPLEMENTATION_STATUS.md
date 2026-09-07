@@ -263,3 +263,98 @@ ce690091-7eb7-5a43-9562-f434e3c790e3/scratchpad/`)に保存。PRへの添付は�
 - 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
   (本セッションのネットワークポリシー上、直接到達確認は不可。Actions成功のみ確認)
 - 未確認事項: 実機スマートフォンでの確認(本セッションでは実施不可)
+
+## 美術改善パス2「図鑑＋具材詳細」(`docs/10_CATALOG_DETAIL_ART_PASS_2.md`)
+
+- branch: `feature/catalog-detail-art-pass-2`
+- base SHA(作業開始時の最新main): `46b993c7febc09e80dffbf4055c4060242313bfb`
+  (PR #9 merge + `docs/10_...md`・マスター5点追加を含む、fetch/merge済みの最新main)
+- head SHA: 本ドキュメント更新時点のcommit(下記コミット一覧を参照。Draft PR作成後にPR側で確認)
+
+### master → production asset 対応
+
+| master(references/ui-v2/) | production(public/assets/) | 寸法 | 容量 |
+|---|---|---|---|
+| `catalog-night-bg-master.png` (852x1847, RGB) | `backgrounds/catalog-night.webp` | 852x1847 | 120K |
+| `bowl-white-master.png` (1254x1254, RGBA) | `bowls/bowl-white.webp` | 768x768 | 40K |
+| `bowl-indigo-master.png` (1254x1254, RGBA) | `bowls/bowl-indigo.webp` | 768x768 | 48K |
+| `bowl-cat-master.png` (1254x1254, RGBA) | `bowls/bowl-cat.webp` | 768x768 | 40K |
+| `bowl-black-master.png` (1254x1254, RGBA) | `bowls/bowl-black.webp` | 768x768 | 52K |
+
+production合計: 約300K。`cwebp -alpha_q 100 -exact`で変換し、変換後に寸法・アルファ(4器とも
+`alpha=True`)・四隅の透明(`srgba(0,0,0,0)`)・黒/白背景の焼き込みがないことを確認済み。
+`dist/`ビルド後、上記5点のみが含まれ、`references/*master*`は含まれないことも確認済み
+(`find dist -iname "*master*"` = 0件)。マスターは`references/`に無変更で保持。
+
+### 変更範囲
+
+- `src/components/Bowl.jsx` / `Bowl.css` — 4種の小鍋WebPを実画像として表示し、旧CSS円形rim/handleを
+  本番表示の主体から外した。キャラクターは出汁面中心付近(目視計測でcx≈50%, cy≈41%)へ配置。
+  species別の表示調整は`CHARACTER_ADJUST`定数へ集約(現状はchikuwa/shiratakiのみ軽微なscale調整、
+  他はデフォルト)。`size="small"/"large"`APIは維持。未発見は常に`bowl-white`+出汁面中央の`?`。
+- `src/data/bowlImages.js`(新規) — 4器IDの固定resolver。`import.meta.env.BASE_URL`必須、
+  未知IDは`bowl-white`へfallback(新しい正式商品として扱わない)。単体テスト3件を追加。
+- `src/components/CatalogNightBackdrop.jsx` / `.css`(新規) — 図鑑専用の夜背景。
+  `.catalog-screen__content`(スクロールする実コンテンツ)の内側に配置し、コンテンツと同じ高さへ
+  伸びることで、画像より内容が長い場合は自然に木色(`#4a2410`)で延長される設計。
+  既存`NightBackdrop`/`ShopScreen`は無変更。
+- `src/screens/CatalogScreen.jsx` / `.css` — タイトル/発見数をアイボリー系カードへ分離、
+  黒いピル名前表示を木札風の名札(左右に鋲風ドット)へ変更、旧6枠目の暗い円形placeholderを削除
+  (5体目の右は自然な空き棚)、旧`padding-left: max(15%, 64px)`(提灯回避用)を新背景に合わせて撤去、
+  カードのタップ領域を44px以上に維持、お気に入りハートをアイボリー地の丸バッジへ変更。
+- `src/screens/SpeciesDetailSheet.jsx` / `.css` — 器選択に選択中インジケータ(視覚:枠線+背景色、
+  アクセシビリティ:`aria-pressed`+ラベルへの✓付記)を追加。染め記録・器選択グリッドを360px幅でも
+  テキストが潰れないよう調整。視線順序(No.→名前→小鍋→説明→基本記録→染め記録→器変更→お気に入り)
+  は既存構造のまま維持。
+- `docs/IMPLEMENTATION_STATUS.md` — 本セクション追記。
+- `docs/10_CATALOG_DETAIL_ART_PASS_2.md` — 既存(今回の指示書、追加変更なし)。
+
+### 明示的に維持した範囲(無変更)
+
+`git diff --stat main`で確認済み。変更されたのは上記「変更範囲」の6ファイル+新規4ファイルのみ。
+- `src/game/`・`src/storage/`・migration/validate/economy/purchase/equip/harvestロジック: 無変更
+- `src/components/AquariumScene.jsx/.css`・`src/components/Character.jsx`・
+  `src/presentation/soakVisual.js`: 無変更
+- `src/components/NightBackdrop.jsx/.css`・`src/screens/ShopScreen.jsx/.css`: 無変更
+  (商店は`art2-11-shop-unchanged-390.png`で夜背景・レイアウトが今回の変更前と同一であることを
+  スクリーンショットで確認)
+- `src/ui/Sheet.jsx/.css`: 無変更(Care/Letters/Settings/ShopItemDetailの見た目に影響なし)
+- がんもの成長色・soakProgress・水槽内キャラクターの既存サイズ差・浮遊/泡/タップ反応・
+  debug保存と通常保存の分離・商品数/価格/ゲーム速度/文章データ: すべて無変更
+- 正式な個体差システム: 今回も未実装(Bowl内のCHARACTER_ADJUSTはpresentation専用の定数であり、
+  ゲーム状態・個体データへは一切持ち込んでいない)
+
+### テスト結果
+
+- `npm test`: 10 test files / 77 tests すべてpass(新規`src/data/__tests__/bowlImages.test.js`
+  3件を含む)
+- `npm run verify:derive`: OK
+- `npm run lint`(oxlint): エラー・警告なし
+- `npm run build`: 成功。`dist/assets/bowls/`に4点、`dist/assets/backgrounds/catalog-night.webp`
+  を確認。`references/*master*`の混入なし。
+- Playwright回帰(scratchpad上のアドホックスクリプト、`npx vite preview`の本番サブパス
+  `/oden-aquarium/`でdebug fixtureを使用): 図鑑未発見/発見済み(360/390/430px)・6枠目placeholder
+  廃止・タップ領域44px・BottomNav非重なり・お気に入り反映・詳細シートの視線順序と初期表示・
+  染め記録6種・器選択4種のURL解決とdisabled状態・商店での実購入フローによる所有反映・
+  一覧への器変更反映・ブラウザ戻るでのシート閉鎖・商店/水槽/お世話/おたより/設定の横スクロール
+  なし・通常URLでdebug保存キーを作成しないこと、を含む一連のチェックがすべてPASS。
+  console error/warning 0件、asset 404等 0件。
+
+### Visual evidence
+
+ローカル保存のみ、PR未添付(このセッションのスクリーンショット添付手段が制限されているため)。
+保存先(セッションscratchpad、repoへはコミットしていない):
+`/tmp/claude-0/-home-user-oden-aquarium/ce690091-7eb7-5a43-9562-f434e3c790e3/scratchpad/`
+- `art2-01-catalog-undiscovered-390.png` 〜 `art2-11-shop-unchanged-390.png`(指示書12章の11枚)
+
+### 未確認事項
+
+- 実機スマートフォンでの確認(本セッションでは実施不可)
+- Playwright回帰はscratchpad上のアドホックスクリプトで実行しており、リポジトリへコミットした
+  固定テストスイートではない(このリポジトリにPlaywrightは依存関係として導入されていないため)
+- ユーザーへのスクリーンショット共有手段(SendUserFile等)が過去のやり取りで制限される場合が
+  あったため、今回はまずscratchpadの正確なパスを報告する
+
+### 状態
+
+Draft PR、ユーザーの美術確認待ち。Ready化・mainへのmerge・Pages deployは未実施。
