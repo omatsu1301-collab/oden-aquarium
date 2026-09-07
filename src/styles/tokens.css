@@ -3,7 +3,10 @@
   --color-surface: #fbf2df;
   --color-surface-strong: #fffaf0;
   --color-text: #4a3018;
-  --color-text-muted: #8a6a44;
+  /* 美術改善パス1: 現行の#8a6a44はクリーム背景上でコントラストが弱く読みにくかったため、
+     読みやすさを文字色側で確保する(仕様9章)。図鑑/商店/設定のレイアウトは変化しない
+     (色のみの変更、サイズ・余白は不変)ことを確認済み。 */
+  --color-text-muted: #6b4f30;
   --color-accent: #f2c14e;
   --color-accent-strong: #dfa62b;
   --color-accent-contrast: #4a2f12;

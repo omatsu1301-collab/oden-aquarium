@@ -1,10 +1,12 @@
 // 最下部の主画面切替(図鑑｜水槽｜商店)。仕様6.1: 選択状態を示す。
+// 美術改善パス1: 絵文字を共通線画SVGへ置換。
+import { BookIcon, TankJarIcon, ShopIcon } from "../icons/Icons.jsx";
 import "./BottomNav.css";
 
 const TABS = [
-  { id: "catalog", label: "図鑑", icon: "📖" },
-  { id: "tank", label: "水槽", icon: "🍶" },
-  { id: "shop", label: "商店", icon: "🏮" },
+  { id: "catalog", label: "図鑑", Icon: BookIcon },
+  { id: "tank", label: "水槽", Icon: TankJarIcon },
+  { id: "shop", label: "商店", Icon: ShopIcon },
 ];
 
 export function BottomNav({ current, onChange }) {
@@ -18,7 +20,7 @@ export function BottomNav({ current, onChange }) {
           onClick={() => onChange(tab.id)}
           aria-current={current === tab.id ? "page" : undefined}
         >
-          <span className="bottom-nav__icon" aria-hidden="true">{tab.icon}</span>
+          <tab.Icon aria-hidden="true" className="bottom-nav__icon" size={22} />
           <span className="bottom-nav__label">{tab.label}</span>
         </button>
       ))}

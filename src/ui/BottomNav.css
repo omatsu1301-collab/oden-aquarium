@@ -13,12 +13,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 3px;
   padding: var(--space-2) 0;
   border: none;
   border-radius: var(--radius-md);
   background: transparent;
-  color: var(--color-text-muted);
+  /* 非選択でも十分読める濃さ(仕様7章、--color-text-mutedより濃い専用色)。 */
+  color: #5c4324;
   font-size: var(--font-small);
   cursor: pointer;
   min-height: var(--tap-min);
@@ -31,8 +33,7 @@
 }
 
 .bottom-nav__icon {
-  font-size: 20px;
-  line-height: 1;
+  flex-shrink: 0;
 }
 
 .bottom-nav__item:focus-visible {

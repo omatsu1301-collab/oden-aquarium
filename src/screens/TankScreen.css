@@ -19,13 +19,25 @@
 }
 
 .tank-screen__brand {
-  background: rgba(255, 250, 235, 0.75);
-  backdrop-filter: blur(4px);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 250, 235, 0.82);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 8px rgba(74, 48, 24, 0.14);
   border-radius: var(--radius-pill);
   padding: 8px 16px;
   font-weight: 700;
   font-size: var(--font-small);
   color: var(--color-accent-contrast);
+  min-height: var(--tap-min);
+  box-sizing: border-box;
+}
+
+.tank-screen__brand-icon {
+  flex-shrink: 0;
+  color: #6b4a1c;
 }
 
 .tank-screen__topbar-actions {
@@ -33,14 +45,19 @@
   gap: var(--space-2);
 }
 
+/* 参考画像のような、丸だけでなく少し角を丸めた乳白色の操作面(仕様7章)。 */
 .tank-screen__icon-btn {
   width: var(--tap-min);
   height: var(--tap-min);
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 250, 235, 0.75);
-  backdrop-filter: blur(4px);
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  background: rgba(255, 250, 235, 0.82);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(74, 48, 24, 0.14);
+  color: #6b4a1c;
   cursor: pointer;
 }
 .tank-screen__icon-btn:focus-visible {
@@ -83,13 +100,24 @@
 }
 
 .tank-screen__status-text {
-  font-size: var(--font-small);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-body);
   color: var(--color-text);
   flex: 1;
 }
 
+.tank-screen__status-icon {
+  flex-shrink: 0;
+  color: var(--color-accent-strong);
+}
+
 .tank-screen__care-btn {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: none;
   border-radius: var(--radius-pill);
   background: var(--color-accent);

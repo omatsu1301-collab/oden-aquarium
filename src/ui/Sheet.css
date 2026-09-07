@@ -75,11 +75,13 @@
   flex-shrink: 0;
   width: var(--tap-min);
   height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 50%;
   background: rgba(74, 48, 24, 0.08);
   color: var(--color-text);
-  font-size: 20px;
   cursor: pointer;
 }
 .sheet__close:focus-visible {

@@ -1,30 +1,59 @@
+/* 美術改善パス1: カードごとの強い浮遊影を減らし、区切り線と余白で整理する(仕様8章)。 */
 .care-sheet__broth {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "vessel info refill";
   align-items: center;
   gap: var(--space-3);
   margin-top: var(--space-2);
+  box-shadow: none;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-strong);
 }
 
-.care-sheet__broth-icon {
-  font-size: 34px;
+/* 360pxでは三列を無理に詰め込まず、器+情報の二列にし、補充ボタンを次の行へ回す。 */
+@media (max-width: 374px) {
+  .care-sheet__broth {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "vessel info"
+      "refill refill";
+  }
+  .care-sheet__refill-btn {
+    margin-top: var(--space-2);
+    width: 100%;
+  }
+}
+
+.care-sheet__vessel-slot {
+  grid-area: vessel;
+  width: 132px;
+  height: 132px;
   flex-shrink: 0;
+}
+@media (max-width: 374px) {
+  .care-sheet__vessel-slot {
+    width: 108px;
+    height: 108px;
+  }
 }
 
 .care-sheet__broth-info {
-  flex: 1;
+  grid-area: info;
   min-width: 0;
 }
 
 .care-sheet__broth-label {
   margin: 0;
-  font-size: var(--font-small);
+  font-size: 12.5px;
   color: var(--color-text-muted);
 }
 
 .care-sheet__broth-name {
   margin: 0 0 6px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
+  color: var(--color-text);
 }
 
 .care-sheet__gauge {
@@ -33,17 +62,20 @@
 
 .care-sheet__remaining-label {
   margin: 0;
-  font-size: var(--font-small);
+  font-size: 12.5px;
   color: var(--color-text-muted);
 }
 
 .care-sheet__refill-btn {
+  grid-area: refill;
   flex-shrink: 0;
-  flex-direction: column;
-  gap: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 16px;
 }
 .care-sheet__refill-note {
+  display: block;
   font-size: 10px;
   font-weight: 400;
   opacity: 0.75;
@@ -52,6 +84,7 @@
 .care-sheet__section-title {
   font-size: var(--font-body);
   font-weight: 800;
+  color: var(--color-text);
   margin: 0 0 var(--space-2);
 }
 
@@ -61,18 +94,33 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0;
 }
 
 .care-sheet__assist-item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  box-shadow: none;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-1);
+}
+.care-sheet__assist-item:last-child {
+  border-bottom: none;
 }
 
-.care-sheet__assist-icon {
-  font-size: 26px;
+.care-sheet__assist-image-slot {
   flex-shrink: 0;
+}
+.care-sheet__assist-image-slot.care-sheet__assist-image--bottle {
+  width: 56px;
+  height: 56px;
+}
+.care-sheet__assist-image-slot.care-sheet__assist-image--jar {
+  width: 64px;
+  height: 64px;
 }
 
 .care-sheet__assist-info {
@@ -82,18 +130,37 @@
 
 .care-sheet__assist-name {
   margin: 0;
+  font-size: 15px;
   font-weight: 700;
+  color: var(--color-text);
+  overflow-wrap: break-word;
 }
 
 .care-sheet__assist-count {
   color: var(--color-text-muted);
   font-weight: 400;
+  font-size: 13px;
 }
 
 .care-sheet__assist-tagline {
   margin: 2px 0 0;
-  font-size: var(--font-small);
+  font-size: 13.5px;
+  color: var(--color-text);
+  opacity: 0.85;
+}
+
+.care-sheet__assist-reason {
+  margin: 3px 0 0;
+  font-size: 12.5px;
   color: var(--color-text-muted);
+}
+
+/* 無効状態でも行全体(画像・商品名・説明)は読める状態を保ち、ボタンだけを無効表現にする。 */
+.care-sheet__assist-btn {
+  flex-shrink: 0;
+}
+.care-sheet__assist-btn:disabled {
+  opacity: 0.45;
 }
 
 .care-sheet__assist-active {
@@ -102,7 +169,7 @@
   color: var(--color-text-muted);
   padding: 8px 14px;
   border-radius: var(--radius-pill);
-  font-size: var(--font-small);
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -110,12 +177,19 @@
   margin-top: var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-2);
 }
 .care-sheet__timer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 0;
-  font-size: var(--font-small);
-  color: var(--color-text-muted);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(242, 193, 78, 0.22);
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .care-sheet__shop-link {
