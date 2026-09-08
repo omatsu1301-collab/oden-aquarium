@@ -76,6 +76,7 @@
   left: 21%;
   top: 20%;
   height: 22%;
+  aspect-ratio: 1;
   transform-origin: 50% 60%;
   animation: aquarium-float-daikon 4.8s ease-in-out infinite;
 }
@@ -85,6 +86,7 @@
   left: 42%;
   top: 47%;
   height: 18%;
+  aspect-ratio: 1;
   transform-origin: 50% 50%;
   animation: aquarium-float-chikuwa 6.2s ease-in-out infinite;
   animation-delay: -1.7s;
@@ -95,6 +97,7 @@
   left: 54%;
   top: 12%;
   height: 19%;
+  aspect-ratio: 1;
   transform-origin: 50% 40%;
   animation: aquarium-float-shirataki 7.6s ease-in-out infinite;
   animation-delay: -2.6s;
@@ -105,6 +108,7 @@
   left: 66%;
   top: 55%;
   height: 14%;
+  aspect-ratio: 1;
   transform-origin: 50% 55%;
   animation: aquarium-float-konnyaku 4.1s ease-in-out infinite;
   animation-delay: -0.9s;
@@ -115,6 +119,7 @@
   left: 12%;
   top: 58%;
   height: 15%;
+  aspect-ratio: 1;
   transform-origin: 50% 55%;
   animation: aquarium-float-ganmo 8.6s ease-in-out infinite;
   animation-delay: -4.3s;
@@ -474,6 +479,7 @@
   left: 36%;
   top: 68%;
   height: 13%;
+  aspect-ratio: 1;
   transform-origin: 50% 55%;
   animation: aquarium-float-slot6 5.4s ease-in-out infinite;
   animation-delay: -2.1s;
@@ -570,7 +576,9 @@
   }
 }
 
-/* 収穫の残像演出: データは既に確定済みで、これは見た目だけの短い余韻。 */
+/* 収穫の残像演出: データは既に確定済みで、これは見た目だけの短い余韻。
+   スロットがempty-waitingへ変わっても(CharacterSlot側で早期returnより前に描画するため)
+   この演出自体は消えず、+N ptが1.4〜1.6秒読めるまで存続する。 */
 .aquarium-scene__afterimage {
   position: absolute;
   inset: 0;
@@ -578,22 +586,13 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  animation: aquarium-afterimage-rise 650ms ease-out forwards;
+  animation: aquarium-afterimage-rise 1.5s ease-out forwards;
 }
 
 .aquarium-scene__afterimage img {
   height: 100%;
   width: auto;
   filter: drop-shadow(0 14px 20px rgba(60, 35, 5, 0.28)) brightness(1.15);
-}
-
-.aquarium-scene__afterimage-points {
-  position: absolute;
-  top: -10%;
-  color: #fff3d6;
-  font-weight: 700;
-  font-size: 13px;
-  text-shadow: 0 1px 3px rgba(60, 35, 5, 0.6);
 }
 
 @keyframes aquarium-afterimage-rise {
@@ -605,6 +604,122 @@
     opacity: 0;
     transform: translateY(-40%) scale(0.7);
   }
+}
+
+:root[data-motion="reduced"] .aquarium-scene__afterimage {
+  animation: aquarium-afterimage-fade 1.5s ease-in-out forwards;
+}
+@keyframes aquarium-afterimage-fade {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 個別の獲得pt表示。明るい出汁背景でも読めるよう、乳白の面+濃茶文字で高コントラストにする。
+   冒頭でポップイン→中盤で静止(読み取れる)→末尾でフェードの3段構成(合計1.5秒)。 */
+.aquarium-scene__harvest-points {
+  position: absolute;
+  top: -8%;
+  left: 50%;
+  color: #4a2f12;
+  font-weight: 800;
+  font-size: 13px;
+  background: rgba(255, 250, 235, 0.95);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill, 999px);
+  box-shadow: 0 2px 6px rgba(60, 35, 5, 0.35);
+  white-space: nowrap;
+  animation: aquarium-harvest-points-pop 1.5s ease-out forwards;
+}
+
+@keyframes aquarium-harvest-points-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20%) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -8%) scale(1.05);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -14%) scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -20%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -34%) scale(0.96);
+  }
+}
+
+:root[data-motion="reduced"] .aquarium-scene__harvest-points {
+  /* 大きな上昇/縮小は止めるが、同程度の読取時間(1.5秒)はフェードで維持する。 */
+  animation: aquarium-harvest-points-fade 1.5s ease-in-out forwards;
+}
+@keyframes aquarium-harvest-points-fade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -14%);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -14%);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, -14%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -14%);
+  }
+}
+
+/* 連続収穫(2体以上)の合計toast。上部バー/下部status bar/BottomNavを塞がない位置に置く。 */
+.aquarium-scene__batch-toast {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 250, 235, 0.95);
+  color: #4a2f12;
+  font-weight: 800;
+  font-size: var(--font-small, 12.5px);
+  padding: 8px 16px;
+  border-radius: var(--radius-pill, 999px);
+  box-shadow: 0 3px 10px rgba(60, 35, 5, 0.3);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 5;
+  animation: aquarium-batch-toast-fade 240ms ease-out;
+}
+@keyframes aquarium-batch-toast-fade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+:root[data-motion="reduced"] .aquarium-scene__batch-toast {
+  animation: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 /* 水槽左下の景観枠(仕様5.5)。能力なし、見た目のみ。1点だけ配置できる。 */
