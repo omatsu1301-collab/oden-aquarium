@@ -3,6 +3,17 @@
 このファイルは実装指示書群の進捗を記録する。コンテキストが切り替わった場合は、
 まずこのファイルを読んでから再開すること。
 
+**注記(Phase 1.5時点)**: PR #11「コアループの手触り改善パス1」は公開版(GitHub Pages)で
+ユーザーが手触り3項目を確認し、2026-09-08に次の値を正式採用した。**PR #11は完全完了。**
+
+- 個別ポイント表示: 1.5秒
+- 連続収穫toast: 2.0秒
+- 補充待ち: 25〜95秒(期待値60秒)
+
+詳細な実装内容・監査対応・merge記録は本ファイル内の「コアループの手触り改善パス1」
+セクションおよび「PR #11 監査対応」を参照。現在の作業はさらに後続のセクション
+(Vercel PR Preview環境構築など)を参照。過去の検証記録は履歴としてそのまま残す。
+
 **注記(Instruction 9時点)**: 以下の「7画面・遊べる完成版(v2)」セクションはPR #8として
 `main`へマージ済み(merge SHA `c5a10fb5506a63c14f6b7fa8dff7baf0117d587d`、deploy run #19
 成功確認済み)。このセクション内の「PR作成待ち」等の記述は過去の実施時点の記録であり、
@@ -581,3 +592,56 @@ Draft PR、ユーザーの体感確認待ち。Ready化・mainへのmerge・Page
 
 この記録を受け、PR #11をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
 Pages deployの成功を確認する工程へ移行する(結果は以下「PR #11 クローズ結果」に追記)。
+
+### PR #11 クローズ結果
+
+- 状態: merged、Pages deploy成功。
+- PR #11 final head: `4d7d47e8ca478d152aa6a4810fdea378f4665238`
+- merge SHA: `f1c6fd7d2e3c3c522730daacce9ea3dbeb2bf51d`
+- deploy run: #27 (id `34188608229`)、conclusion: `success`
+  (https://github.com/omatsu1301-collab/oden-aquarium/actions/runs/34188608229)
+- build job / deploy job: ともに `completed / success`
+- 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
+
+### 手触り3項目の正式採用(公開版確認、2026-09-08)
+
+ユーザーが公開版(GitHub Pages)で実際に触り、手触り3項目すべてを正式採用した。
+**PR #11「コアループの手触り改善パス1」はこれで完全完了。**
+
+- 個別ポイント表示: 1.5秒
+- 連続収穫toast: 2.0秒
+- 補充待ち: 25〜95秒(期待値60秒)
+
+いずれも第一パスの暫定値からの変更なし(そのままの値で採用)。今後この値を変更する場合は
+別途指示に基づいて行う。
+
+## Phase 1.5「Vercel PR Preview環境構築」
+
+- branch: `phase1.5-vercel-preview`
+- base SHA(作業開始時の最新main): `f1c6fd7d2e3c3c522730daacce9ea3dbeb2bf51d`(PR #11 merge)
+- 原因: `vite.config.js`のGitHub Pages用`base: "/oden-aquarium/"`がVercel buildにもそのまま
+  適用され、ルート`/`基準で配信されるVercel上でasset参照が壊れ、`https://oden-aquarium.vercel.app/`
+  が真っ白になっていた。
+- 対応: リポジトリルートへ`vercel.json`を新規追加し、`buildCommand`で
+  `npm run build -- --base=/`を実行してVercel用だけViteの`base`を上書きした。
+  `outputDirectory`は`dist`。redirect/rewrite/環境変数/framework固定は追加していない。
+  GitHub Pages用の`npm run build`(引数なし)・`vite.config.js`・
+  `.github/workflows/deploy.yml`は無変更。
+- 検証: 通常`npm run build`は`/oden-aquarium/assets/...`基準を維持、
+  `npm run build -- --base=/`は`/assets/...`基準で出力されることをJSバンドル内の
+  実際の文字列で確認。両buildを個別実行し、出力(JSバンドルのハッシュ・中身)が
+  混ざらないことを確認済み。`npm test`(87 tests)/ `verify:derive` / `lint` /
+  両方の`build`、すべて成功。
+
+### Vercel Preview確認結果
+
+- Vercel deployment status: `success`(GitHub commit statusで確認、context `Vercel`,
+  description `Deployment has completed`)
+- Preview URL: https://oden-aquarium-git-phase15-vercel-preview-omatsu1301-collab.vercel.app
+- 本セッションはネットワーク許可ドメインの制約(egress policy)によりVercel上のURLへ
+  直接アクセスできず(`WebFetch`/`curl`いずれも`EGRESS_BLOCKED`)、画面表示・console error・
+  レスポンシブの確認はユーザー側のブラウザで実施した。
+- ユーザーが実際にPreview URLを開き、トップ画面・`?debug=1#tank`(debug fixture付き水槽画面)の
+  表示と基本操作を確認。**PR #12を採用する**と明示。
+- この採用を受け、PR #12をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
+  Vercel本番とGitHub Pagesの表示確認まで進める(結果は以下「PR #12 クローズ結果」に追記)。
