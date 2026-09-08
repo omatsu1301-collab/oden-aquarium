@@ -1,9 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { applyAction } from "../actions.js";
 import { createInitialGameState } from "../state.js";
-import { SPAWN_WAIT_MS } from "../constants.js";
+import { SPAWN_WAIT_MIN_MS, SPAWN_WAIT_MAX_MS } from "../constants.js";
+import { stepRng } from "../rng.js";
 
 const T0 = 1_700_000_000_000;
+
+// rngState=1のcreateInitialGameStateから、種族抽選→補充待ち抽選の順で1回ずつseedを進めたときの
+// 決定的な期待値(HARVEST/EQUIP_POTのどちらも初回抽選はこの2回のstepRngから導かれる)。
+function expectedFirstDraw(seed) {
+  const species = stepRng(seed);
+  const wait = stepRng(species.nextSeed);
+  const waitMs = Math.round(SPAWN_WAIT_MIN_MS + wait.value * (SPAWN_WAIT_MAX_MS - SPAWN_WAIT_MIN_MS));
+  return { waitMs, nextSeed: wait.nextSeed };
+}
 
 describe("HARVEST", () => {
   it("成熟していない個体は収穫できない(状態が変化しない)", () => {
@@ -23,7 +33,11 @@ describe("HARVEST", () => {
     // 収穫後は空き待ちに遷移するため、instanceIdは失われる(位置=slots[0]で追跡する)。
     const slot = next.slots[0];
     expect(slot.status).toBe("empty-waiting");
-    expect(slot.spawnAt).toBe(T0 + SPAWN_WAIT_MS);
+    const expected = expectedFirstDraw(1);
+    expect(slot.spawnAt).toBe(T0 + expected.waitMs);
+    expect(slot.spawnAt).toBeGreaterThanOrEqual(T0 + SPAWN_WAIT_MIN_MS);
+    expect(slot.spawnAt).toBeLessThanOrEqual(T0 + SPAWN_WAIT_MAX_MS);
+    expect(next.rngState).toBe(expected.nextSeed);
   });
 
   it("同じ個体を連続で収穫しても二重加算されない", () => {
@@ -34,12 +48,32 @@ describe("HARVEST", () => {
     expect(again.wallet).toBe(walletAfterFirst);
   });
 
-  it("収穫後60秒でスロットに次の個体が育ち始める", () => {
+  it("補充待ち時間の経過後、スロットに次の個体が育ち始める", () => {
     let state = createInitialGameState(T0, 1);
     state = applyAction(state, { type: "HARVEST", instanceId: 1 }, T0);
-    const later = applyAction(state, { type: "SET_SETTINGS", settings: {} }, T0 + SPAWN_WAIT_MS + 1000);
-    const grownSlot = later.slots.find((s) => s.status === "growing" && s.spawnedAt === T0 + SPAWN_WAIT_MS);
+    const spawnAt = state.slots[0].spawnAt;
+    const later = applyAction(state, { type: "SET_SETTINGS", settings: {} }, spawnAt + 1000);
+    const grownSlot = later.slots.find((s) => s.status === "growing" && s.spawnedAt === spawnAt);
     expect(grownSlot).toBeTruthy();
+  });
+
+  it("同一時刻に複数体を順次収穫すると、各スロットの補充時刻が固定60秒へ揃わない(分散する)", () => {
+    let state = createInitialGameState(T0, 1);
+    // 3体を同時に成熟させてから、同一nowMsで順次収穫する。
+    state = {
+      ...state,
+      slots: state.slots.map((slot, i) => (i < 3 ? { ...slot, progress: 100 } : slot)),
+    };
+    state = applyAction(state, { type: "HARVEST", instanceId: 1 }, T0);
+    state = applyAction(state, { type: "HARVEST", instanceId: 2 }, T0);
+    state = applyAction(state, { type: "HARVEST", instanceId: 3 }, T0);
+    const spawnAts = state.slots.slice(0, 3).map((s) => s.spawnAt);
+    // 全スロットが同一時刻(旧仕様の固定60秒同期)へ揃っていないことを検証する。
+    expect(new Set(spawnAts).size).toBeGreaterThan(1);
+    for (const spawnAt of spawnAts) {
+      expect(spawnAt).toBeGreaterThanOrEqual(T0 + SPAWN_WAIT_MIN_MS);
+      expect(spawnAt).toBeLessThanOrEqual(T0 + SPAWN_WAIT_MAX_MS);
+    }
   });
 });
 
@@ -81,7 +115,10 @@ describe("BUY_ITEM / 装備", () => {
     const next = applyAction(state, { type: "EQUIP_POT", potId: "deep" }, T0);
     expect(next.slots.length).toBe(6);
     expect(next.slots[5].status).toBe("empty-waiting");
-    expect(next.slots[5].spawnAt).toBe(T0 + SPAWN_WAIT_MS);
+    const expected = expectedFirstDraw(1);
+    expect(next.slots[5].spawnAt).toBe(T0 + expected.waitMs);
+    expect(next.slots[5].spawnAt).toBeGreaterThanOrEqual(T0 + SPAWN_WAIT_MIN_MS);
+    expect(next.slots[5].spawnAt).toBeLessThanOrEqual(T0 + SPAWN_WAIT_MAX_MS);
   });
 
   it("5枠へ戻しても既存の6体目は収穫まで消えない", () => {

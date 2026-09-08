@@ -7,10 +7,9 @@ import { getAssist } from "../data/assists.js";
 import { getDecoration } from "../data/decorations.js";
 import { getShopItem } from "../data/shopCatalog.js";
 import { getQuest } from "../data/quests.js";
-import { advanceGame, drawNextSpeciesForSlot } from "./engine.js";
+import { advanceGame, drawNextSpeciesForSlot, drawSpawnWaitMs } from "./engine.js";
 import { evaluateQuest } from "./quests.js";
 import { isLetterAvailable } from "./letters.js";
-import { SPAWN_WAIT_MS } from "./constants.js";
 
 function isOwned(state, itemId) {
   return state.inventory.ownedIds.includes(itemId);
@@ -47,14 +46,17 @@ function harvestSlot(state, action) {
   );
 
   const slots = state.slots.slice();
+  let finalSeed = nextSeed;
   if (slot.retiring) {
     slots.splice(index, 1);
   } else {
+    const { waitMs, nextSeed: seedAfterWait } = drawSpawnWaitMs(nextSeed);
+    finalSeed = seedAfterWait;
     slots[index] = {
       status: "empty-waiting",
       pendingSpeciesId: nextSpeciesId,
       pendingBrothId: state.tank.brothId,
-      spawnAt: action.nowMs + SPAWN_WAIT_MS,
+      spawnAt: action.nowMs + waitMs,
       duplicateStreak: nextStreak,
       retiring: false,
     };
@@ -63,7 +65,7 @@ function harvestSlot(state, action) {
   return {
     ...stateWithCatalog,
     slots,
-    rngState: nextSeed,
+    rngState: finalSeed,
     wallet: state.wallet + species.harvestPoints,
     stats: { ...state.stats, harvestTotal: state.stats.harvestTotal + 1 },
     tutorial: { ...state.tutorial, firstHarvestHintShown: true },
@@ -118,12 +120,13 @@ function equipPot(state, action) {
     const toAdd = newCapacity - slots.length;
     for (let i = 0; i < toAdd; i += 1) {
       const draw = drawNextSpeciesForSlot({ ...state, rngState }, state.tank.brothId, 0);
-      rngState = draw.nextSeed;
+      const wait = drawSpawnWaitMs(draw.nextSeed);
+      rngState = wait.nextSeed;
       slots.push({
         status: "empty-waiting",
         pendingSpeciesId: draw.speciesId,
         pendingBrothId: state.tank.brothId,
-        spawnAt: action.nowMs + SPAWN_WAIT_MS,
+        spawnAt: action.nowMs + wait.waitMs,
         duplicateStreak: 0,
         retiring: false,
       });
