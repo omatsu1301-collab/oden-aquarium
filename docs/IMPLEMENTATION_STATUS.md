@@ -679,3 +679,9 @@ read-only監査で確認した事実:
   `src/presentation/shopAssistState.js`の純粋関数へ切り出した。
 - 保存schema / migration / 価格 / 効果量 / duration は無変更。
 - Phase 3の商店美術・画像・背景・鍋previewは未着手。
+
+### ユーザー採用記録(2026-09-08)
+
+ユーザーがPR #13を正式採用した。
+
+Vercel Previewの下スクロール確認で、商品数の多い「出汁」「飾り」タブにおいて、NightBackdropの終端より下で生成り色の背景が露出する既存の表示不具合を確認した。これはPR #13の変更が原因ではなく、CSSハッシュも不変である。PR #13のscope外とし、merge後に最新mainから独立した別PRで修正する。本記録時点では背景修正へ未着手。Phase 3は未着手。
