@@ -392,7 +392,7 @@ Pages deployの成功を確認する工程へ移行する(結果は以下「PR #
 - 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
 - 未確認事項: 実機スマートフォンでの確認(ユーザーが任意で行う項目)
 
-## コアループの手触り改善パス1(`docs/11_CORE_LOOP_FEEL_PASS_1_INSTRUCTION.md`)
+## コアループの手触り改善パス1(Instruction 11: 収穫ポイントの余韻＋補充リズム)
 
 - branch: `feature/core-loop-feel-pass-1`
 - base SHA(作業開始時の最新main): `0c6124fda8307c1b52e7b87aa0bc741512846109`(PR #10 merge、指示書記載のSHAと一致を確認)
