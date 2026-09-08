@@ -4,7 +4,10 @@ export const GAME_SCHEMA_VERSION = 2;
 export const MS_PER_MINUTE = 60 * 1000;
 export const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 
-export const SPAWN_WAIT_MS = 60 * 1000;
+// 補充待ち時間は一様分布[MIN, MAX]で抽選する(期待値60秒、コアループの手触り改善パス1)。
+// 同時に複数体を収穫しても次の個体が同時刻に揃わないよう分散させるための範囲。
+export const SPAWN_WAIT_MIN_MS = 25 * 1000;
+export const SPAWN_WAIT_MAX_MS = 95 * 1000;
 export const LAMP_PITY_STREAK = 4;
 export const REMAINING_LOW_THRESHOLD = 0.25;
 

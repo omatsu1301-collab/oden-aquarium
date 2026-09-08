@@ -7,7 +7,7 @@ import { getSpecies } from "../data/species.js";
 import { drawSpeciesId } from "../data/broths.js";
 import { SPECIES_ORDER, SPECIES_COUNT } from "../data/species.js";
 import { stepRng } from "./rng.js";
-import { LAMP_PITY_STREAK } from "./constants.js";
+import { LAMP_PITY_STREAK, SPAWN_WAIT_MIN_MS, SPAWN_WAIT_MAX_MS } from "./constants.js";
 
 export function getPotConfig(state) {
   return getPot(state.tank.potId);
@@ -93,6 +93,14 @@ function drawNextSpeciesForSlot(state, brothId, duplicateStreak) {
   }
 
   return { speciesId, nextStreak, nextSeed };
+}
+
+// 補充待ち時間を[SPAWN_WAIT_MIN_MS, SPAWN_WAIT_MAX_MS]の一様分布で抽選する(期待値60秒)。
+// 種族抽選とは別にseedを1回進める、同じseedなら同じ待ち時間・同じ次seedになる決定的な実装。
+function drawSpawnWaitMs(seed) {
+  const { value, nextSeed } = stepRng(seed);
+  const waitMs = Math.round(SPAWN_WAIT_MIN_MS + value * (SPAWN_WAIT_MAX_MS - SPAWN_WAIT_MIN_MS));
+  return { waitMs, nextSeed };
 }
 
 // [fromMs, toMs) の区間を、倍率が一定である前提で積分する(ブレイクポイントは含まない)。
@@ -181,4 +189,4 @@ export function advanceGame(state, nowMs) {
   return { ...current, lastSimulatedAt: nowMs };
 }
 
-export { drawNextSpeciesForSlot, getSpeciesGrowthRatePerMs, isCareActiveAt };
+export { drawNextSpeciesForSlot, drawSpawnWaitMs, getSpeciesGrowthRatePerMs, isCareActiveAt };

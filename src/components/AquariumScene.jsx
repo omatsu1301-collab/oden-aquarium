@@ -2,12 +2,20 @@
 // スロットの中身(どの具材が育っているか)は都度state.slotsから渡され、
 // 位置(浮遊keyframe)自体は既存の5配置(+6枠目)を再利用する。
 // 水槽領域をなぞっての連続収穫(仕様4.4)にも対応する。
+// コアループの手触り改善パス1(仕様4章): 収穫の実処理(dispatch)・収穫SEの一回性・
+// 連続収穫の合計集計は、タップ/Enter・Space/なぞりのどの経路でもここのonRequestHarvestへ集約する。
 import { useRef, useState } from "react";
 import { CharacterSlot } from "./Character.jsx";
 import { getDecoration } from "../data/decorations.js";
+import { getSpecies } from "../data/species.js";
+import { playSe } from "../audio/audioEngine.js";
+import { nextHarvestBatch } from "../presentation/harvestBatch.js";
 import "./AquariumScene.css";
 
 const backgroundImage = `${import.meta.env.BASE_URL}assets/backgrounds/aquarium-background.webp`;
+
+// 合計toastの表示時間(最後の収穫から)。個別の+N ptの余韻(1.4〜1.6秒)より少し長く保つ。
+const BATCH_TOAST_DISPLAY_MS = 2000;
 
 const BUBBLES = [
   { left: "8%", size: 5, duration: 7.2, delay: -1.4, rise: "-88vh", opacity: 0.35 },
@@ -34,7 +42,10 @@ const POSITION_CLASSES = [
 export function AquariumScene({ slots, onHarvest, decorationId }) {
   const isDraggingRef = useRef(false);
   const draggedInstanceIdsRef = useRef(new Set());
-  const [, forceRender] = useState(0);
+  const [batch, setBatch] = useState(null);
+  const [announcement, setAnnouncement] = useState(null);
+  const announcementIdRef = useRef(0);
+  const batchTimeoutRef = useRef(null);
 
   function handlePointerDown() {
     isDraggingRef.current = true;
@@ -43,11 +54,30 @@ export function AquariumScene({ slots, onHarvest, decorationId }) {
   function endDrag() {
     isDraggingRef.current = false;
   }
-  function handleDragEnterHarvest(instanceId) {
-    if (draggedInstanceIdsRef.current.has(instanceId)) return;
+
+  // なぞり操作中、同じ個体を二重に処理しないためのゲート。
+  // true=まだ処理されていない(この呼び出しで進めてよい)。
+  function claimDragHarvest(instanceId) {
+    if (draggedInstanceIdsRef.current.has(instanceId)) return false;
     draggedInstanceIdsRef.current.add(instanceId);
+    return true;
+  }
+
+  // 収穫の唯一の入口(仕様4.1)。タップ・Enter/Space・なぞりのすべてがここへ集約する。
+  // 1. dispatchを即時発行(演出の完了を待たない) 2. 収穫SEを一度だけ鳴らす
+  // 3. 連続収穫の集計(体数・合計pt)を更新する 4. 読み上げ用テキストを更新する
+  function handleRequestHarvest(instanceId, speciesId, points) {
     onHarvest(instanceId);
-    forceRender((n) => n + 1);
+    playSe("harvest");
+
+    // 同一species・同一ptの収穫が連続しても読み上げが更新されるよう、毎回新しいidを持たせて
+    // live region内の要素をkeyごと差し替える(同じ文字列のまま据え置くと読み上げられない場合がある)。
+    setAnnouncement({ id: announcementIdRef.current++, text: `${getSpecies(speciesId).name}をすくった、${points}pt獲得` });
+
+    const nowMs = Date.now();
+    setBatch((prev) => nextHarvestBatch(prev, { points }, nowMs));
+    if (batchTimeoutRef.current) window.clearTimeout(batchTimeoutRef.current);
+    batchTimeoutRef.current = window.setTimeout(() => setBatch(null), BATCH_TOAST_DISPLAY_MS);
   }
 
   const decoration = decorationId ? getDecoration(decorationId) : null;
@@ -97,12 +127,22 @@ export function AquariumScene({ slots, onHarvest, decorationId }) {
             slot={slot}
             floatClassName={position.float}
             tapClassName={position.tap}
-            onHarvest={onHarvest}
-            onDragEnterHarvest={handleDragEnterHarvest}
+            onRequestHarvest={handleRequestHarvest}
+            claimDragHarvest={claimDragHarvest}
             isDraggingRef={isDraggingRef}
           />
         );
       })}
+
+      {batch && batch.count >= 2 && (
+        <div className="aquarium-scene__batch-toast" role="status">
+          {batch.count}体すくった　+{batch.points} pt
+        </div>
+      )}
+
+      <span className="visually-hidden" aria-live="polite">
+        {announcement && <span key={announcement.id}>{announcement.text}</span>}
+      </span>
     </div>
   );
 }

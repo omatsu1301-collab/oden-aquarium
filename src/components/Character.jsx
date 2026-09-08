@@ -1,7 +1,10 @@
 // UIコンポーネント: 水槽の1スロット(空き待ち/育成中)の描画とタップ反応を担当する。
-// 成熟個体のタップ/Enter/Spaceは即座に収穫を確定させ(データ処理を先に一度だけ確定)、
-// 「すくわれた」演出はこのコンポーネント内のローカルstateだけで作る残像として表現する
-// (収穫処理自体はアニメ終了を待たない)。
+// 成熟個体の収穫は、タップ・Enter/Space・なぞりのすべてが requestHarvest() という
+// 同一関数を通る(コアループの手触り改善パス1、仕様4.1)。
+// データ処理(dispatch)・収穫SE・連続収穫集計はAquariumScene側のonRequestHarvestが担い、
+// このコンポーネントは自分の位置に出す個別の「+N pt」演出(afterimage)だけを局所stateで持つ。
+// 空き待ちへ状態が変わっても、この演出はCharacterSlotの外側(早期returnより前)で
+// 描画され続けるため、収穫直後に演出ごと消えることはない。
 // 未成熟のタップは既存のかわいい反応(ぷるん/逃げ・タップ泡・きらめき)をそのまま使う。
 import { useRef, useState } from "react";
 import { getSpecies } from "../data/species.js";
@@ -32,8 +35,8 @@ export function CharacterSlot({
   slot,
   floatClassName,
   tapClassName,
-  onHarvest,
-  onDragEnterHarvest,
+  onRequestHarvest,
+  claimDragHarvest,
   isDraggingRef,
 }) {
   const tapRef = useRef(null);
@@ -44,18 +47,14 @@ export function CharacterSlot({
   const [afterimage, setAfterimage] = useState(null);
   const afterimageIdRef = useRef(0);
   const hintTimeoutRef = useRef(null);
+  // 直近でrequestHarvest()を通したinstanceId。dispatchは非同期(ゲームlock経由)のため、
+  // slot propsが更新される前に同じinstanceIdへ2回目の要求が来ても、ここで同期的に弾く。
+  // 新しい個体(=新しいinstanceId)が来れば自然に比較が外れ、通常どおり収穫できる。
+  const claimedInstanceIdRef = useRef(null);
 
-  if (slot.status !== "growing") {
-    // 空き待ちスロット: 個体はまだいない(小さな泡だけで表現)。
-    return (
-      <div className={floatClassName}>
-        <span className="aquarium-scene__empty-hint" aria-hidden="true" />
-      </div>
-    );
-  }
-
-  const species = getSpecies(slot.speciesId);
-  const mature = slot.progress >= 100;
+  const growing = slot.status === "growing";
+  const species = growing ? getSpecies(slot.speciesId) : null;
+  const mature = growing && slot.progress >= 100;
 
   function playTapReaction() {
     const el = tapRef.current;
@@ -73,13 +72,19 @@ export function CharacterSlot({
     setTapBubbles((prev) => [...prev, ...newBubbles].slice(-MAX_TAP_BUBBLES));
   }
 
+  // 収穫の唯一の入口。タップ/Enter・Space/なぞりのすべてがここを通る。
+  // 同一instanceIdへの2回目以降の要求は、dispatchがまだ反映されていなくても同期的に無視する。
+  function requestHarvest() {
+    if (claimedInstanceIdRef.current === slot.instanceId) return;
+    claimedInstanceIdRef.current = slot.instanceId;
+    const id = afterimageIdRef.current++;
+    setAfterimage({ id, speciesId: slot.speciesId, points: species.harvestPoints });
+    onRequestHarvest(slot.instanceId, slot.speciesId, species.harvestPoints);
+  }
+
   function handleActivate() {
     if (mature) {
-      // データ処理を先に一度だけ確定し、演出はローカルの残像だけで見せる。
-      const id = afterimageIdRef.current++;
-      setAfterimage({ id, speciesId: slot.speciesId, points: species.harvestPoints });
-      onHarvest(slot.instanceId);
-      playSe("harvest");
+      requestHarvest();
       return;
     }
     playTapReaction();
@@ -97,13 +102,35 @@ export function CharacterSlot({
   }
 
   function handlePointerEnter() {
-    if (mature && isDraggingRef?.current) {
-      onDragEnterHarvest?.(slot.instanceId);
+    if (mature && isDraggingRef?.current && claimDragHarvest(slot.instanceId)) {
+      requestHarvest();
     }
   }
 
   function handleTapBubbleEnd(id) {
     setTapBubbles((prev) => prev.filter((bubble) => bubble.id !== id));
+  }
+
+  const afterimageNode = afterimage && (
+    <div
+      key={afterimage.id}
+      className="aquarium-scene__afterimage"
+      onAnimationEnd={() => setAfterimage(null)}
+    >
+      <img src={imageUrlFor(afterimage.speciesId)} alt="" draggable={false} />
+      <span className="aquarium-scene__harvest-points">+{afterimage.points}pt</span>
+    </div>
+  );
+
+  if (!growing) {
+    // 空き待ちスロット: 個体はまだいない(小さな泡だけで表現)。
+    // afterimageは個体の有無と無関係に描画し続けるため、収穫直後にここへ来ても消えない。
+    return (
+      <div className={floatClassName}>
+        <span className="aquarium-scene__empty-hint" aria-hidden="true" />
+        {afterimageNode}
+      </div>
+    );
   }
 
   return (
@@ -150,16 +177,7 @@ export function CharacterSlot({
         ))}
       </div>
 
-      {afterimage && (
-        <div
-          key={afterimage.id}
-          className="aquarium-scene__afterimage"
-          onAnimationEnd={() => setAfterimage(null)}
-        >
-          <img src={imageUrlFor(afterimage.speciesId)} alt="" draggable={false} />
-          <span className="aquarium-scene__afterimage-points">+{afterimage.points}pt</span>
-        </div>
-      )}
+      {afterimageNode}
     </div>
   );
 }

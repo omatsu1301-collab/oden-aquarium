@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { advanceGame } from "../engine.js";
+import { advanceGame, drawSpawnWaitMs } from "../engine.js";
 import { createInitialGameState } from "../state.js";
-import { MS_PER_HOUR, MS_PER_MINUTE } from "../constants.js";
+import { MS_PER_HOUR, MS_PER_MINUTE, SPAWN_WAIT_MIN_MS, SPAWN_WAIT_MAX_MS } from "../constants.js";
 
 const T0 = 1_700_000_000_000;
 
@@ -154,5 +154,35 @@ describe("advanceGame", () => {
       expect(stepwise.slots[i].progress).toBeCloseTo(oneShot.slots[i].progress, 5);
     }
     expect(stepwise.tank.remainingRatio).toBeCloseTo(oneShot.tank.remainingRatio, 5);
+  });
+});
+
+describe("drawSpawnWaitMs", () => {
+  it("同じseedから同じ待ち時間と次seedが得られる(決定的)", () => {
+    const a = drawSpawnWaitMs(12345);
+    const b = drawSpawnWaitMs(12345);
+    expect(a).toEqual(b);
+  });
+
+  it("待ち時間は常に25秒〜95秒の範囲内(多数のseedで境界近くも含めて検証)", () => {
+    for (let seed = -1000; seed < 1000; seed += 1) {
+      const { waitMs } = drawSpawnWaitMs(seed);
+      expect(waitMs).toBeGreaterThanOrEqual(SPAWN_WAIT_MIN_MS);
+      expect(waitMs).toBeLessThanOrEqual(SPAWN_WAIT_MAX_MS);
+    }
+  });
+
+  it("抽選後のnextSeedは元のseedから進む(RNG状態を消費する)", () => {
+    const { nextSeed } = drawSpawnWaitMs(42);
+    expect(nextSeed).not.toBe(42);
+    expect(Number.isInteger(nextSeed)).toBe(true);
+  });
+
+  it("異なるseedからは(ほぼ)異なる待ち時間が得られ、固定60秒へ収束しない", () => {
+    const waits = new Set();
+    for (let seed = 0; seed < 20; seed += 1) {
+      waits.add(drawSpawnWaitMs(seed).waitMs);
+    }
+    expect(waits.size).toBeGreaterThan(1);
   });
 });

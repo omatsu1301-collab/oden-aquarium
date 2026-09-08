@@ -380,3 +380,204 @@ Draft PR、ユーザーの美術確認待ち。Ready化・mainへのmerge・Page
 
 この採用を受け、PR #10をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
 Pages deployの成功を確認する工程へ移行する(結果は以下「PR #10 クローズ結果」に追記)。
+
+### PR #10 クローズ結果
+
+- 状態: merged、Pages deploy成功。**美術改善パス2は完了。**
+- PR #10 final head: `b4164191ef6b2c923f8eb05f4fbf96eef4696080`
+- merge SHA: `0c6124fda8307c1b52e7b87aa0bc741512846109`
+- deploy run: #26 (id `34135761931`)、conclusion: `success`
+  (https://github.com/omatsu1301-collab/oden-aquarium/actions/runs/34135761931)
+- build job / deploy job: ともに `completed / success`
+- 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
+- 未確認事項: 実機スマートフォンでの確認(ユーザーが任意で行う項目)
+
+## コアループの手触り改善パス1(Instruction 11: 収穫ポイントの余韻＋補充リズム)
+
+- branch: `feature/core-loop-feel-pass-1`
+- base SHA(作業開始時の最新main): `0c6124fda8307c1b52e7b87aa0bc741512846109`(PR #10 merge、指示書記載のSHAと一致を確認)
+- head SHA: `de5a104f91415a125f8e9b050fdaa88d5d906b42`(本ドキュメント追記時点。以降のコミットはDraft PR側で確認)
+
+### 原因分析(着手前に現コードで確認した内容)
+
+- `CharacterSlot`は`slot.status !== "growing"`になると早期returnで空き表示だけを返しており、
+  収穫dispatch直後に同じスロットが`empty-waiting`へ変わるため、ローカルstateに残像
+  (`afterimage`)を持たせていても表示領域ごと即座に消えていた。
+- なぞり収穫は`AquariumScene`の`handleDragEnterHarvest`が`onHarvest`を直接呼ぶだけで、
+  タップ/Enter・Spaceが通る`CharacterSlot`内の演出(残像・収穫SE)を経由していなかった。
+- `src/game/actions.js`の収穫後補充と鍋拡張時の新規スロットが、どちらも固定
+  `SPAWN_WAIT_MS(60秒)`を使っており、同時刻の連続収穫が同じ`spawnAt`になっていた。
+
+### 実装した内容
+
+**収穫経路の統一(仕様4章)**
+- `Character.jsx`: タップ・Enter/Space・なぞりのすべてが`requestHarvest()`という同一のローカル
+  関数を通るようにした。個別の`+N pt`演出(afterimage)は、`growing`分岐の外側(早期returnの前)
+  で描画するよう変更し、スロットが`empty-waiting`へ変わっても演出だけは1.5秒間存続する。
+- `AquariumScene.jsx`: 収穫の実処理(dispatch)・収穫SEの一回性・連続収穫集計・読み上げ用
+  アナウンスを`onRequestHarvest`へ集約した。なぞり操作の二重処理防止(`draggedInstanceIdsRef`)
+  は維持しつつ、実際の収穫効果は`CharacterSlot`側の統一関数を経由するようにした。
+
+**個別の`+N pt`(仕様4.2)**
+- 乳白(`rgba(255,250,235,.95)`)地に濃茶(`#4a2f12`)文字のピル表示へ変更し、明るい出汁背景でも
+  読めるコントラストにした。
+- アニメーションをポップイン(0-15%)→静止して読める区間(25-75%)→フェード(75-100%)の
+  3段構成・合計1.5秒に変更(旧実装は650ms・動き続けるだけだった)。
+- `data-motion="reduced"`では上昇・縮小を止め、同程度の読取時間のフェードのみにした
+  (残像画像・ptピルの両方に個別のreduced-motion keyframeを追加)。
+
+**連続収穫の合計(仕様4.3)**
+- `src/presentation/harvestBatch.js`(新規)に、直前の収穫から800ms以内なら同じバッチへ
+  加算し、それを超えれば新しいバッチとしてリセットする純粋関数`nextHarvestBatch`を実装。
+  Reactのstate/タイマーに依存せず、時刻を引数で受け取るため単体テストで決定的に検証できる。
+- `AquariumScene`は収穫のたびにこの関数を呼び、2体以上になった場合だけ
+  「N体すくった　+M pt」toastを表示する。toast自体は最後の収穫から約2秒(`BATCH_TOAST_DISPLAY_MS`)
+  で消え、新しいバッチは体数・合計0から再スタートする。表示位置は水槽上部(6%)で、
+  上部アイコン・下部status bar・BottomNavのいずれとも重ならない。
+
+**アクセシビリティ(仕様4.4)**
+- `aria-live="polite"`の読み上げ領域(`visually-hidden`)を追加し、収穫のたびに
+  「{具材名}をすくった、{pt}pt獲得」を流す。
+
+**補充時刻のランダム分散(仕様5章)**
+- `src/game/constants.js`: 固定`SPAWN_WAIT_MS`を`SPAWN_WAIT_MIN_MS(25秒)`/
+  `SPAWN_WAIT_MAX_MS(95秒)`(期待値60秒)へ置換。
+- `src/game/engine.js`: 既存の`stepRng`/`rngState`を使う決定的な`drawSpawnWaitMs(seed)`を追加
+  (種族抽選とは別にseedを1回進める、`Math.random()`は不使用)。
+- `src/game/actions.js`: 収穫後の補充(`harvestSlot`)と、より大きい鍋を装備したときの新規スロット
+  (`equipPot`)の両方に同じ抽選を適用。`retiring`スロット(収穫時にそのまま消える)は
+  wait抽選をスキップし、無駄にseedを消費しない。
+- 保存済み`spawnAt`は絶対時刻のまま、schema versionもmigrationも変更していない。
+
+### 自律判断した値と理由
+
+- 個別`+N pt`のCSSアニメーション時間は仕様の目安(1.4〜1.6秒)の中央寄りである1.5秒に決定。
+  合計toastの表示時間は「個別の余韻より少し長く保つ」という仕様の意図から2.0秒とした。
+- 合計toastの表示位置(水槽上部6%)は、既存の`tank-screen__tutorial-hint`(40%付近)や
+  上部アイコン・下部status barと重ならない位置として選定。両者が同時に出る場面は
+  実際には発生しない(初回ハーベストで`tutorial.firstHarvestHintShown`が立ち、以降の
+  複数収穫ではヒントは既に非表示のため)ことをコードで確認済み。
+- `.aquarium-scene__{daikon,chikuwa,shirataki,konnyaku,ganmo,slot6}-float`へ
+  `aspect-ratio: 1`を追加(自律判断・技術的な修正)。個別`+N pt`をafterimage側で
+  描画し続けるようにした結果、育成中のボタンが無い(`empty-waiting`)状態ではこの
+  位置決めdivの子要素が10px四方の`empty-hint`だけになり、明示的な`width`を持たない
+  divの横幅がその10pxへ収縮していた(高さのみ%指定だったため)。これにより残像画像・
+  ptピルの土台がほぼ0幅になっていた問題を、既存の5体全キャラクター画像が
+  ほぼ正方形(実測684x700〜725x750等)であることを踏まえ、`aspect-ratio:1`で明示的に
+  安定させることで解消した。育成中の見た目・浮遊アニメーション・既存配置は変更していない
+  (視覚的な差はスクリーンショット比較で確認済み、数値も従来のshrink-to-fit幅とほぼ一致)。
+
+### 変更していない重要領域
+
+- がんもの成長色(`soakVisual`)・soakProgress、水槽内キャラクターの既存サイズ差、
+  巨大こんにゃくにつながるサイズ挙動、AquariumSceneの背景・既存配置・浮遊keyframe・泡・
+  未成熟タップ反応(いずれも数値は無変更、`aspect-ratio`追加のみ)。
+- 5枠+深い土鍋6枠のcapacity、図鑑・具材詳細の採用済み美術、商店26商品・価格・
+  所有/装備/消費ロジック。
+- 保存・migration・validation・複数タブlock・debug保存分離(`spawnAt`は絶対時刻のまま、
+  schema versionは無変更)。
+- 正式な個体差システムは実装していない。
+- growthMinutes・出汁倍率・残量消費・効果時間・収穫ポイント・商品価格は無変更。
+
+### テストと最終件数
+
+- `npm test`: 11 test files / **87 tests** すべてpass(内訳: 既存77件+今回追加10件
+  [game層5件: `drawSpawnWaitMs`の決定性/範囲/seed進行/分散4件、同時収穫の分散を確認する
+  actions.test.js 1件、presentation層5件: `nextHarvestBatch`の集計ロジック])
+- `npm run verify:derive`: OK
+- `npm run lint`(oxlint): エラー・警告なし
+- `npm run build`: 成功
+
+### Playwright等の回帰結果
+
+scratchpad上のアドホックスクリプト(`/oden-aquarium/`本番サブパス+debug fixtureで実行、
+既存運用どおり)で以下をすべて確認、全項目PASS:
+- 5体をなぞって収穫し、wallet差分・合計toast(体数・合計pt)が正しい
+- 収穫済みスロットへの再なぞり/追加クリックで二重加算・二重SEが起きない
+- 5種それぞれの単体タップで正しい個別`+N pt`とwallet差分
+- Enter/Spaceキーでも同じ結果
+- 収穫直後・約1秒後もptが読める、合計toastは約2秒後に消える
+- reduced motionでも`+N pt`が表示される(`data-motion="reduced"`を確認)
+- 同時収穫後のspawnAtが25〜95秒の範囲内で分散し、固定値へ揃わない
+- 時間経過で全スロットが正しく育成再開する
+- 360×640/390×844/430×932で水槽・図鑑・商店・お世話・おたより・設定に横スクロールなし
+- 通常URLでdebug保存キーが混入しない
+- console error/warning 0件、asset 404等 0件
+
+### 視覚証跡の場所
+
+セッションscratchpad(repoへはコミットしない):
+`/tmp/claude-0/-home-user-oden-aquarium/ce690091-7eb7-5a43-9562-f434e3c790e3/scratchpad/`
+- `feel1-01-single-harvest-point-390.png` — 単体収穫直後の個別`+N pt`
+- `feel1-02-batch-toast-390.png` — 5体なぞり後の合計toast(体数+合計pt)と各個体の`+N pt`
+- `feel1-04-reduced-motion-390.png` — reduced motionでの`+N pt`表示
+
+### 未確認事項
+
+- 実機スマートフォンでの確認は本セッションでは実施不可
+- Playwright回帰はscratchpad上のアドホックスクリプトで実行しており、リポジトリへコミットした
+  固定テストスイートではない
+- 25〜95秒という範囲値は第一パスの暫定採用値であり、体感確認後にユーザーが必要なら再調整する
+  (仕様5.1に明記のとおり)
+
+### 状態(監査前)
+
+Draft PR、ユーザーの体感確認待ち。Ready化・mainへのmerge・Pages deployは未実施。
+
+### PR #11 監査対応(Ready化前の技術修正)
+
+全体設計・変更範囲・RNG・保存互換・テスト結果は問題なしとの監査結果を受け、Ready化前に
+次の2点を修正した(commit `57e5204`)。
+
+1. **同一instanceIdへの収穫要求を同期的に一度だけ通す**: `dispatch`は`withGameLock`経由の
+   非同期処理のため、slot propsが更新される前に同じinstanceIdへ`requestHarvest()`が
+   2回呼ばれると、game reducer側のwallet二重加算防止はあってもUI側の演出(afterimage・
+   収穫SE・連続収穫集計)は2回分になりうる状態だった。`CharacterSlot`に
+   `claimedInstanceIdRef`(直近でrequestHarvestを通したinstanceIdを覚える同期的なref)を
+   追加し、同一instanceIdへの2回目以降の要求を`requestHarvest()`の先頭で無条件に無視する
+   ようにした。タップ・Enter/Space・なぞりはすべて同じ`requestHarvest()`を通るため、
+   3経路すべてに共通して効く。新しいinstanceId(次に来る個体)には影響しない。
+2. **同一文言でもaria-liveが毎回更新されるようにする**: `announcement`をプレーンな文字列から
+   `{id, text}`へ変更し、live region内の子要素を`key={id}`付きで毎回新規マウントするように
+   した。同一species・同一ptを連続収穫してもテキストが変化せず読み上げられない、という
+   懸念を解消しつつ、live region内は常に子要素1個のみを保つことで二重読み上げも防いでいる。
+
+### 監査対応の回帰確認結果
+
+scratchpadのアドホックPlaywrightスクリプトで以下をすべて確認、全項目PASS:
+1. 同一成熟個体へネイティブDOM APIで同期的に2回click(`dispatchEvent`)を発火しても、
+   wallet差分は+20(1回分)、`.aquarium-scene__afterimage`は1個のみ、`+N pt`表示も1回分
+2. その操作で合計toast(「N体すくった」)が誤って表示されない
+3. 異なる2個体の連続収穫は従来どおりwallet差分・合計toast(「2体すくった +44 pt」)が正しい
+4. 同じ位置に新しい個体(新instanceId)が来れば正常に収穫できる(ガードが古いinstanceIdだけに
+   効くことを確認。位置クラス名は座標であり種族固定ではないため、補充後の種族は抽選次第)
+5. 同一species・同一pt(「ganmoをすくった、40pt獲得」)の収穫を2回連続で発生させ、
+   `MutationObserver`でlive region内の`childList`変化を直接検証(mutations>=2を確認)。
+   live region内の子要素数は常に1個(二重読み上げの懸念なし)
+- 前回までの回帰スイート(`core-loop-feel-pass1-regression.mjs`)を再実行し、全項目引き続きPASS
+- `npm test`(87 tests)/ `npm run verify:derive` / `npm run lint` / `npm run build`
+  すべて引き続き成功(件数・結果に変化なし)
+
+### 状態(監査後)
+
+Draft PR、ユーザーの体感確認待ち。Ready化・mainへのmerge・Pages deployは未実施。
+
+### ユーザー採用記録(技術面、2026-09-08)
+
+ユーザーがGitHub上の最終head SHA・差分・Draft状態を確認し、手元でも`npm test`(87 tests)・
+`npm run lint`・`npm run build`を再実行して成功したことを確認したうえで、「技術面は採用する」
+と明示した。
+
+ただし、本セッションのpreviewサーバー(`localhost:5199`)はこのクラウド上の隔離環境の中だけで
+動いており、ユーザーのブラウザから到達できないため、ユーザーからアクセス可能なPR Preview環境が
+まだ存在しない。そのため、次を明示的な例外条件としてクローズ工程へ進む。
+
+- 手触り3項目(個別`+N pt`の読みやすさ・約1.5秒の余韻/複数収穫トーストの情報量・約2秒の余韻/
+  25〜95秒の補充ばらつきの自然さ)の最終確認は、Pages deploy後の公開版
+  (https://omatsu1301-collab.github.io/oden-aquarium/)で行う。
+- 表示時間(個別`+N pt`の1.5秒・合計toastの2.0秒)と補充範囲(25〜95秒、期待値60秒)は、
+  現段階では第一パスの暫定採用値のまま据え置く。公開版での確認後、ユーザーが必要と判断すれば
+  再調整する(仕様5.1に明記の方針どおり)。
+
+この記録を受け、PR #11をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
+Pages deployの成功を確認する工程へ移行する(結果は以下「PR #11 クローズ結果」に追記)。
