@@ -645,3 +645,27 @@ Pages deployの成功を確認する工程へ移行する(結果は以下「PR #
   表示と基本操作を確認。**PR #12を採用する**と明示。
 - この採用を受け、PR #12をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
   Vercel本番とGitHub Pagesの表示確認まで進める(結果は以下「PR #12 クローズ結果」に追記)。
+
+## Phase 2 / Instruction 12「商店現状監査＋共通アイコン／看板styleboard設計」
+
+- 状態: **read-only監査完了**。コード変更・branch・commit・PRなし。
+- Visual Gate 3点: 2026-09-08にユーザーが正式採用した。これは部品規則の採用であり、
+  最終商店背景・最終商品画像・黒いplaceholderシルエットの採用ではない。
+
+採用した3項目:
+
+- 共通ビジュアル言語: 夜の職人街、栗色の木、生成り、琥珀、濃茶を基調とする部品規則
+- category icon: 出汁／鍋／道具／おたすけ／飾りの統一線画5種
+- 看板・point・status: 暖簾紋、硬貨記号、使用中／所持／購入可能／残高不足の情報階層
+
+read-only監査で確認した事実:
+
+- 5カテゴリ26商品(出汁6／鍋4／道具4／おたすけ4／飾り8)
+- 既存10画像ファイルで14商品枠をカバー可能
+- assistの`category`衝突をP1として再現した。静的assistデータでは`category`が効果分類
+  `growth` / `care`を表す一方、`shopCatalog.js`の`register()`が同じフィールドを商店分類
+  `assist`で上書きする。game action層は元データを直接参照するため不正消費・保存破壊は
+  防止しているが、商店詳細の使用中表示・同系統busy・出汁残量0時のdisabled・assistアイコンが
+  誤判定する
+- Instruction 13「assist効果分類と商店状態判定の分離修正」を、Phase 3 Wave 1
+  (shop shell pilot)前の必須bugfix gateとした
