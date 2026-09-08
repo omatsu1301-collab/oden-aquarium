@@ -380,3 +380,14 @@ Draft PR、ユーザーの美術確認待ち。Ready化・mainへのmerge・Page
 
 この採用を受け、PR #10をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
 Pages deployの成功を確認する工程へ移行する(結果は以下「PR #10 クローズ結果」に追記)。
+
+### PR #10 クローズ結果
+
+- 状態: merged、Pages deploy成功。**美術改善パス2は完了。**
+- PR #10 final head: `b4164191ef6b2c923f8eb05f4fbf96eef4696080`
+- merge SHA: `0c6124fda8307c1b52e7b87aa0bc741512846109`
+- deploy run: #26 (id `34135761931`)、conclusion: `success`
+  (https://github.com/omatsu1301-collab/oden-aquarium/actions/runs/34135761931)
+- build job / deploy job: ともに `completed / success`
+- 公開URL: https://omatsu1301-collab.github.io/oden-aquarium/
+- 未確認事項: 実機スマートフォンでの確認(ユーザーが任意で行う項目)
