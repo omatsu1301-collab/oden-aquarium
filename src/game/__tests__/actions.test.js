@@ -164,6 +164,46 @@ describe("おたすけ(消耗品)", () => {
     expect(second.inventory.consumables.drop).toBe(1); // 消費されない
   });
 
+  it("同系統(成長)の別商品は同時に使用できず、個数を消費しない", () => {
+    let state = withDrops(createInitialGameState(T0, 1), 1);
+    state = {
+      ...state,
+      inventory: { ...state.inventory, consumables: { ...state.inventory.consumables, "rich-drop": 1 } },
+    };
+    state = applyAction(state, { type: "USE_ASSIST", assistId: "drop" }, T0);
+    const second = applyAction(state, { type: "USE_ASSIST", assistId: "rich-drop" }, T0);
+    expect(second.effects.growth.itemId).toBe("drop");
+    expect(second.inventory.consumables["rich-drop"]).toBe(1);
+    expect(second.effects.care).toBe(null);
+  });
+
+  it("同系統(お留守番)の別商品は同時に使用できず、個数を消費しない", () => {
+    let state = createInitialGameState(T0, 1);
+    state = {
+      ...state,
+      inventory: { ...state.inventory, consumables: { care: 1, "long-care": 1 } },
+    };
+    state = applyAction(state, { type: "USE_ASSIST", assistId: "care" }, T0);
+    expect(state.effects.care.itemId).toBe("care");
+    const second = applyAction(state, { type: "USE_ASSIST", assistId: "long-care" }, T0);
+    expect(second.effects.care.itemId).toBe("care");
+    expect(second.inventory.consumables["long-care"]).toBe(1);
+  });
+
+  it("growthとcareは同時に使用できる", () => {
+    let state = createInitialGameState(T0, 1);
+    state = {
+      ...state,
+      inventory: { ...state.inventory, consumables: { drop: 1, care: 1 } },
+    };
+    state = applyAction(state, { type: "USE_ASSIST", assistId: "drop" }, T0);
+    state = applyAction(state, { type: "USE_ASSIST", assistId: "care" }, T0);
+    expect(state.effects.growth.itemId).toBe("drop");
+    expect(state.effects.care.itemId).toBe("care");
+    expect(state.inventory.consumables.drop).toBe(0);
+    expect(state.inventory.consumables.care).toBe(0);
+  });
+
   it("残量0のときお留守番だしは使用できない", () => {
     let state = createInitialGameState(T0, 1);
     state = {
@@ -174,6 +214,19 @@ describe("おたすけ(消耗品)", () => {
     const next = applyAction(state, { type: "USE_ASSIST", assistId: "care" }, T0);
     expect(next.effects.care).toBe(null);
     expect(next.inventory.consumables.care).toBe(1);
+  });
+
+  it("正常使用時だけ対応するeffectと個数が更新される", () => {
+    let state = withDrops(createInitialGameState(T0, 1), 1);
+    const used = applyAction(state, { type: "USE_ASSIST", assistId: "drop" }, T0);
+    expect(used.inventory.consumables.drop).toBe(0);
+    expect(used.effects.growth).toEqual({
+      itemId: "drop",
+      multiplier: 1.5,
+      expiresAt: T0 + 30 * 60 * 1000,
+    });
+    expect(used.effects.care).toBe(null);
+    expect(used.wallet).toBe(state.wallet);
   });
 });
 
