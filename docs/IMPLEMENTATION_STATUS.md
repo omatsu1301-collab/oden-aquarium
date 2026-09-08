@@ -558,6 +558,26 @@ scratchpadのアドホックPlaywrightスクリプトで以下をすべて確認
 - `npm test`(87 tests)/ `npm run verify:derive` / `npm run lint` / `npm run build`
   すべて引き続き成功(件数・結果に変化なし)
 
-### 状態
+### 状態(監査後)
 
 Draft PR、ユーザーの体感確認待ち。Ready化・mainへのmerge・Pages deployは未実施。
+
+### ユーザー採用記録(技術面、2026-09-08)
+
+ユーザーがGitHub上の最終head SHA・差分・Draft状態を確認し、手元でも`npm test`(87 tests)・
+`npm run lint`・`npm run build`を再実行して成功したことを確認したうえで、「技術面は採用する」
+と明示した。
+
+ただし、本セッションのpreviewサーバー(`localhost:5199`)はこのクラウド上の隔離環境の中だけで
+動いており、ユーザーのブラウザから到達できないため、ユーザーからアクセス可能なPR Preview環境が
+まだ存在しない。そのため、次を明示的な例外条件としてクローズ工程へ進む。
+
+- 手触り3項目(個別`+N pt`の読みやすさ・約1.5秒の余韻/複数収穫トーストの情報量・約2秒の余韻/
+  25〜95秒の補充ばらつきの自然さ)の最終確認は、Pages deploy後の公開版
+  (https://omatsu1301-collab.github.io/oden-aquarium/)で行う。
+- 表示時間(個別`+N pt`の1.5秒・合計toastの2.0秒)と補充範囲(25〜95秒、期待値60秒)は、
+  現段階では第一パスの暫定採用値のまま据え置く。公開版での確認後、ユーザーが必要と判断すれば
+  再調整する(仕様5.1に明記の方針どおり)。
+
+この記録を受け、PR #11をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
+Pages deployの成功を確認する工程へ移行する(結果は以下「PR #11 クローズ結果」に追記)。
