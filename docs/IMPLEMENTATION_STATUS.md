@@ -614,3 +614,34 @@ Pages deployの成功を確認する工程へ移行する(結果は以下「PR #
 
 いずれも第一パスの暫定値からの変更なし(そのままの値で採用)。今後この値を変更する場合は
 別途指示に基づいて行う。
+
+## Phase 1.5「Vercel PR Preview環境構築」
+
+- branch: `phase1.5-vercel-preview`
+- base SHA(作業開始時の最新main): `f1c6fd7d2e3c3c522730daacce9ea3dbeb2bf51d`(PR #11 merge)
+- 原因: `vite.config.js`のGitHub Pages用`base: "/oden-aquarium/"`がVercel buildにもそのまま
+  適用され、ルート`/`基準で配信されるVercel上でasset参照が壊れ、`https://oden-aquarium.vercel.app/`
+  が真っ白になっていた。
+- 対応: リポジトリルートへ`vercel.json`を新規追加し、`buildCommand`で
+  `npm run build -- --base=/`を実行してVercel用だけViteの`base`を上書きした。
+  `outputDirectory`は`dist`。redirect/rewrite/環境変数/framework固定は追加していない。
+  GitHub Pages用の`npm run build`(引数なし)・`vite.config.js`・
+  `.github/workflows/deploy.yml`は無変更。
+- 検証: 通常`npm run build`は`/oden-aquarium/assets/...`基準を維持、
+  `npm run build -- --base=/`は`/assets/...`基準で出力されることをJSバンドル内の
+  実際の文字列で確認。両buildを個別実行し、出力(JSバンドルのハッシュ・中身)が
+  混ざらないことを確認済み。`npm test`(87 tests)/ `verify:derive` / `lint` /
+  両方の`build`、すべて成功。
+
+### Vercel Preview確認結果
+
+- Vercel deployment status: `success`(GitHub commit statusで確認、context `Vercel`,
+  description `Deployment has completed`)
+- Preview URL: https://oden-aquarium-git-phase15-vercel-preview-omatsu1301-collab.vercel.app
+- 本セッションはネットワーク許可ドメインの制約(egress policy)によりVercel上のURLへ
+  直接アクセスできず(`WebFetch`/`curl`いずれも`EGRESS_BLOCKED`)、画面表示・console error・
+  レスポンシブの確認はユーザー側のブラウザで実施した。
+- ユーザーが実際にPreview URLを開き、トップ画面・`?debug=1#tank`(debug fixture付き水槽画面)の
+  表示と基本操作を確認。**PR #12を採用する**と明示。
+- この採用を受け、PR #12をDraft→Ready→`main`へ通常merge(squash/rebaseは使わない)し、
+  Vercel本番とGitHub Pagesの表示確認まで進める(結果は以下「PR #12 クローズ結果」に追記)。
