@@ -520,6 +520,44 @@ scratchpad上のアドホックスクリプト(`/oden-aquarium/`本番サブパ�
 - 25〜95秒という範囲値は第一パスの暫定採用値であり、体感確認後にユーザーが必要なら再調整する
   (仕様5.1に明記のとおり)
 
+### 状態(監査前)
+
+Draft PR、ユーザーの体感確認待ち。Ready化・mainへのmerge・Pages deployは未実施。
+
+### PR #11 監査対応(Ready化前の技術修正)
+
+全体設計・変更範囲・RNG・保存互換・テスト結果は問題なしとの監査結果を受け、Ready化前に
+次の2点を修正した(commit `57e5204`)。
+
+1. **同一instanceIdへの収穫要求を同期的に一度だけ通す**: `dispatch`は`withGameLock`経由の
+   非同期処理のため、slot propsが更新される前に同じinstanceIdへ`requestHarvest()`が
+   2回呼ばれると、game reducer側のwallet二重加算防止はあってもUI側の演出(afterimage・
+   収穫SE・連続収穫集計)は2回分になりうる状態だった。`CharacterSlot`に
+   `claimedInstanceIdRef`(直近でrequestHarvestを通したinstanceIdを覚える同期的なref)を
+   追加し、同一instanceIdへの2回目以降の要求を`requestHarvest()`の先頭で無条件に無視する
+   ようにした。タップ・Enter/Space・なぞりはすべて同じ`requestHarvest()`を通るため、
+   3経路すべてに共通して効く。新しいinstanceId(次に来る個体)には影響しない。
+2. **同一文言でもaria-liveが毎回更新されるようにする**: `announcement`をプレーンな文字列から
+   `{id, text}`へ変更し、live region内の子要素を`key={id}`付きで毎回新規マウントするように
+   した。同一species・同一ptを連続収穫してもテキストが変化せず読み上げられない、という
+   懸念を解消しつつ、live region内は常に子要素1個のみを保つことで二重読み上げも防いでいる。
+
+### 監査対応の回帰確認結果
+
+scratchpadのアドホックPlaywrightスクリプトで以下をすべて確認、全項目PASS:
+1. 同一成熟個体へネイティブDOM APIで同期的に2回click(`dispatchEvent`)を発火しても、
+   wallet差分は+20(1回分)、`.aquarium-scene__afterimage`は1個のみ、`+N pt`表示も1回分
+2. その操作で合計toast(「N体すくった」)が誤って表示されない
+3. 異なる2個体の連続収穫は従来どおりwallet差分・合計toast(「2体すくった +44 pt」)が正しい
+4. 同じ位置に新しい個体(新instanceId)が来れば正常に収穫できる(ガードが古いinstanceIdだけに
+   効くことを確認。位置クラス名は座標であり種族固定ではないため、補充後の種族は抽選次第)
+5. 同一species・同一pt(「ganmoをすくった、40pt獲得」)の収穫を2回連続で発生させ、
+   `MutationObserver`でlive region内の`childList`変化を直接検証(mutations>=2を確認)。
+   live region内の子要素数は常に1個(二重読み上げの懸念なし)
+- 前回までの回帰スイート(`core-loop-feel-pass1-regression.mjs`)を再実行し、全項目引き続きPASS
+- `npm test`(87 tests)/ `npm run verify:derive` / `npm run lint` / `npm run build`
+  すべて引き続き成功(件数・結果に変化なし)
+
 ### 状態
 
 Draft PR、ユーザーの体感確認待ち。Ready化・mainへのmerge・Pages deployは未実施。
