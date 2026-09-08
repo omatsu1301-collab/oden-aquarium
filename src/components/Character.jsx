@@ -47,6 +47,10 @@ export function CharacterSlot({
   const [afterimage, setAfterimage] = useState(null);
   const afterimageIdRef = useRef(0);
   const hintTimeoutRef = useRef(null);
+  // 直近でrequestHarvest()を通したinstanceId。dispatchは非同期(ゲームlock経由)のため、
+  // slot propsが更新される前に同じinstanceIdへ2回目の要求が来ても、ここで同期的に弾く。
+  // 新しい個体(=新しいinstanceId)が来れば自然に比較が外れ、通常どおり収穫できる。
+  const claimedInstanceIdRef = useRef(null);
 
   const growing = slot.status === "growing";
   const species = growing ? getSpecies(slot.speciesId) : null;
@@ -69,7 +73,10 @@ export function CharacterSlot({
   }
 
   // 収穫の唯一の入口。タップ/Enter・Space/なぞりのすべてがここを通る。
+  // 同一instanceIdへの2回目以降の要求は、dispatchがまだ反映されていなくても同期的に無視する。
   function requestHarvest() {
+    if (claimedInstanceIdRef.current === slot.instanceId) return;
+    claimedInstanceIdRef.current = slot.instanceId;
     const id = afterimageIdRef.current++;
     setAfterimage({ id, speciesId: slot.speciesId, points: species.harvestPoints });
     onRequestHarvest(slot.instanceId, slot.speciesId, species.harvestPoints);

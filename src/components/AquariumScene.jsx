@@ -43,7 +43,8 @@ export function AquariumScene({ slots, onHarvest, decorationId }) {
   const isDraggingRef = useRef(false);
   const draggedInstanceIdsRef = useRef(new Set());
   const [batch, setBatch] = useState(null);
-  const [announcement, setAnnouncement] = useState("");
+  const [announcement, setAnnouncement] = useState(null);
+  const announcementIdRef = useRef(0);
   const batchTimeoutRef = useRef(null);
 
   function handlePointerDown() {
@@ -69,7 +70,9 @@ export function AquariumScene({ slots, onHarvest, decorationId }) {
     onHarvest(instanceId);
     playSe("harvest");
 
-    setAnnouncement(`${getSpecies(speciesId).name}をすくった、${points}pt獲得`);
+    // 同一species・同一ptの収穫が連続しても読み上げが更新されるよう、毎回新しいidを持たせて
+    // live region内の要素をkeyごと差し替える(同じ文字列のまま据え置くと読み上げられない場合がある)。
+    setAnnouncement({ id: announcementIdRef.current++, text: `${getSpecies(speciesId).name}をすくった、${points}pt獲得` });
 
     const nowMs = Date.now();
     setBatch((prev) => nextHarvestBatch(prev, { points }, nowMs));
@@ -138,7 +141,7 @@ export function AquariumScene({ slots, onHarvest, decorationId }) {
       )}
 
       <span className="visually-hidden" aria-live="polite">
-        {announcement}
+        {announcement && <span key={announcement.id}>{announcement.text}</span>}
       </span>
     </div>
   );
