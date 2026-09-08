@@ -7,6 +7,7 @@ import { LadleIcon, ClockIcon } from "../icons/Icons.jsx";
 import { getBroth } from "../data/broths.js";
 import { ASSIST_ORDER, getAssist } from "../data/assists.js";
 import { getAssistImageUrl } from "../data/itemImages.js";
+import { getShopAssistUseState } from "../presentation/shopAssistState.js";
 import { getRemainingStatusLabel, getEffectRemainingMs, formatDurationShort } from "../game/selectors.js";
 import "../ui/primitives.css";
 import "./CareSheet.css";
@@ -28,10 +29,6 @@ export function CareSheet({ open, onClose, state, dispatch, onOpenShop }) {
 
   function refill() {
     dispatch({ type: "REFILL_BROTH" });
-  }
-
-  function categoryActiveEffect(category) {
-    return category === "growth" ? state.effects.growth : state.effects.care;
   }
 
   function handleUseAssist(assistId) {
@@ -75,11 +72,11 @@ export function CareSheet({ open, onClose, state, dispatch, onOpenShop }) {
         {ASSIST_ORDER.map((id) => {
           const assist = getAssist(id);
           const owned = state.inventory.consumables[id] ?? 0;
-          const activeEffect = categoryActiveEffect(assist.category);
-          const isThisActive = activeEffect?.itemId === id;
-          const categoryBusy = Boolean(activeEffect) && !isThisActive;
-          const careBlocked = assist.category === "care" && state.tank.remainingRatio <= 0;
-          const disabled = owned <= 0 || categoryBusy || careBlocked;
+          const { isThisActive, categoryBusy, careBlocked, disabled } = getShopAssistUseState(
+            assist,
+            state,
+            owned,
+          );
 
           let disabledReason = null;
           if (!isThisActive) {

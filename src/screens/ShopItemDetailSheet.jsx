@@ -2,6 +2,7 @@
 import { Sheet } from "../ui/Sheet.jsx";
 import { getShopItem } from "../data/shopCatalog.js";
 import { SPECIES_ORDER, getSpecies } from "../data/species.js";
+import { getShopAssistUseState } from "../presentation/shopAssistState.js";
 import { playSe } from "../audio/audioEngine.js";
 import "../ui/primitives.css";
 import "./ShopItemDetailSheet.css";
@@ -132,16 +133,13 @@ function ToolEquipRow({ item, state, dispatch }) {
 }
 
 function AssistUseRow({ item, state, dispatch, owned }) {
-  const activeEffect = item.category === "growth" ? state.effects.growth : state.effects.care;
-  const isThisActive = activeEffect?.itemId === item.id;
-  const categoryBusy = Boolean(activeEffect) && !isThisActive;
-  const careBlocked = item.category === "care" && state.tank.remainingRatio <= 0;
+  const { isThisActive, disabled } = getShopAssistUseState(item, state, owned);
   if (isThisActive) return <p className="shop-detail__active-note">使用中</p>;
   return (
     <button
       type="button"
       className="btn btn--outline btn--block"
-      disabled={owned <= 0 || categoryBusy || careBlocked}
+      disabled={disabled}
       onClick={() => dispatch({ type: "USE_ASSIST", assistId: item.id })}
     >
       使う

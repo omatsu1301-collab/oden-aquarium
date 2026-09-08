@@ -669,3 +669,13 @@ read-only監査で確認した事実:
   誤判定する
 - Instruction 13「assist効果分類と商店状態判定の分離修正」を、Phase 3 Wave 1
   (shop shell pilot)前の必須bugfix gateとした
+
+## Instruction 13「assist効果分類と商店状態判定の分離修正」
+
+- branch: `fix/assist-effect-category`
+- base SHA: `8132beeb90ca02b17f9455799a332f843a75b7af`
+- 内容: 静的assistデータの効果分類を`effectCategory`へ改名し、商店registryの
+  `category: "assist"`と共存させる。商店詳細の使用可否判定は
+  `src/presentation/shopAssistState.js`の純粋関数へ切り出した。
+- 保存schema / migration / 価格 / 効果量 / duration は無変更。
+- Phase 3の商店美術・画像・背景・鍋previewは未着手。

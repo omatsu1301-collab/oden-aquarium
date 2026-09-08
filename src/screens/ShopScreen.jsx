@@ -10,7 +10,7 @@ function ShopItemIcon({ item }) {
     broth: "🍶",
     pot: "🍲",
     tool: "🧰",
-    assist: item.category === "growth" ? "💧" : "🫙",
+    assist: item.effectCategory === "growth" ? "💧" : item.effectCategory === "care" ? "🫙" : "•",
     decoration: item.slotType === "bowl" ? "🥣" : "🪴",
   };
   return <span className="shop-item-card__icon" aria-hidden="true">{icons[item.category]}</span>;

@@ -183,7 +183,7 @@ function consumeAssist(state, action) {
   const owned = state.inventory.consumables[assist.id] ?? 0;
   if (owned <= 0) return state;
 
-  if (assist.category === "growth") {
+  if (assist.effectCategory === "growth") {
     if (state.effects.growth) return state;
     return {
       ...state,
@@ -202,7 +202,7 @@ function consumeAssist(state, action) {
     };
   }
 
-  if (assist.category === "care") {
+  if (assist.effectCategory === "care") {
     if (state.tank.remainingRatio <= 0) return state;
     if (state.effects.care) return state;
     return {
