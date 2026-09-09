@@ -706,14 +706,39 @@ Vercel Previewの下スクロール確認で、商品数の多い「出汁」「
 
 ## Instruction 15「Phase 3 Wave 1 — 商店shellの代表実装」
 
-- 状態: **実装済み・Visual Gate待ち**。ユーザー採用済みではない。Ready化・merge禁止。
+- 状態: **構造prototypeとして条件付き採用**。最終商店背景・最終iconの採用ではない。
+  Ready化・merge禁止。Wave 2へ進まない。
 - branch: `feat/phase3-wave1-shop-shell-pilot`
 - base SHA: `a104e2c31f0af9bd9cc01b7ad67cd44e46d7822e`
-- 内容: 採用済みの共通ビジュアル言語を商店shellへ代表実装した。
-  - `ShopBackdrop`: 共有`NightBackdrop`の上へ軒・木枠・灯りをCSS合成。ラスター新規生成なし。
-  - 看板に暖簾紋、walletに同心円の硬貨記号
-  - 出汁／鍋／道具／おたすけ／飾りの統一線画iconと5tab
-  - 生成りの共通カードprimitive
+- 実装 commit: `40f8e6e9f7b478b39bacf97c500b6ac4895f361e`
+- 内容: 商店shellの構造prototypeを実装した。
+  - `ShopBackdrop`: 共有`NightBackdrop`の上へ商店専用レイヤーを合成する責務分離
+  - header / wallet / 5tab / 2列cardの構造
   - `使用中`／`所持`／`購入可能`／`残高不足`の表示分類(`shopCardStatus.js`)
+  - responsiveとcomponent境界
 - 商品数・価格・効果量・duration、PR #13のassist分類契約、PR #14のfallback背景は維持。
 - `ShopItemDetailSheet`、商品個別美術、鍋preview、Wave 2は未着手。
+- 現在の背景デザイン、category icon 5種の最終造形、商品card上のcategory icon fallback、
+  看板／木枠／card surfaceの最終美術は未採用。これらはPhase 3 Wave 1BでAI生成と
+  Visual Gateを経て全面更新する。
+
+### ユーザー条件付き採用記録(2026-09-09)
+
+ユーザーがPR #15を「構造prototype」として条件付き採用した。
+
+採用したもの:
+
+- ShopBackdropの責務分離
+- header / wallet / 5tab / 2列cardの構造
+- 使用中 / 所持 / 購入可能 / 残高不足の表示分類
+- responsiveとcomponent境界
+
+採用しなかったもの:
+
+- 現在の背景デザイン
+- category icon 5種の最終造形
+- 商品card上のcategory icon fallback
+- 看板、木枠、card surfaceの最終美術
+
+この記録は最終商店背景・最終iconの採用ではない。背景とiconは次のPhase 3 Wave 1Bで
+AI生成・Visual Gateを経て全面更新する。Ready化・merge・Wave 2へは進まない。
