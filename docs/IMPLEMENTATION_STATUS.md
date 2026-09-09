@@ -685,3 +685,21 @@ read-only監査で確認した事実:
 ユーザーがPR #13を正式採用した。
 
 Vercel Previewの下スクロール確認で、商品数の多い「出汁」「飾り」タブにおいて、NightBackdropの終端より下で生成り色の背景が露出する既存の表示不具合を確認した。これはPR #13の変更が原因ではなく、CSSハッシュも不変である。PR #13のscope外とし、merge後に最新mainから独立した別PRで修正する。本記録時点では背景修正へ未着手。Phase 3は未着手。
+
+## Instruction 14「商店下端の背景連続性修正」
+
+- branch: `fix/shop-scroll-background-continuity`
+- base SHA: `10d08e80bb464d8b54470bb2a55050ffe7ff4693`
+- 実装 commit: `722ad14ee083d08fb5382de3766a4dc3353fa4ed`
+- 内容: `.shop-screen` に `background-color: var(--night-shelf-dark)` を追加し、
+  商品数の多い「出汁」「飾り」タブを下端までスクロールしたとき、NightBackdrop終端後に
+  生成り色が露出する既存不具合を修正した。NightBackdropの提灯・暖簾・窓・棚textureは
+  引き伸ばしていない。
+- 変更ファイル: `src/screens/ShopScreen.css`（本記録の docs 追記を除く）
+- Phase 3 の商店美術・category icon・商品画像・鍋preview は未着手。
+
+### ユーザー採用記録(2026-09-09)
+
+ユーザーがPR #14を正式採用した。
+
+出汁・飾りの最下部からBottomNav直上まで濃茶が自然に連続し、商店上部の提灯・暖簾・窓や商品カードが変わっていないことを確認したうえでの採用。この記録を受け、PR #14をDraft→Ready→`main`へ通常mergeする。
