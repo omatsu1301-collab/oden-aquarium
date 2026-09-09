@@ -3,6 +3,8 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* NightBackdrop は inset:0 のため一覧が長いと終端より下が透明になり、背後の生成り色が露出する。 */
+  background-color: var(--night-shelf-dark);
 }
 
 .shop-screen__content {
