@@ -133,3 +133,84 @@ export function CloseIcon(props) {
     </Icon>
   );
 }
+
+// 商店売り場: 出汁。湯気と小さな鍋。BottomNavの既存iconは変えない。
+export function ShopBrothIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M6.2 16.4h11.6c.5 1.7-2.1 3-5.8 3s-6.3-1.3-5.8-3Z" />
+      <path d="M6.2 16.4c0-1.5 2.6-2.4 5.8-2.4s5.8.9 5.8 2.4" />
+      <path d="M8.6 7.4c.2 1.5 1 2.3 2 2.3" />
+      <path d="M12 4.8c.25 1.8 1.2 2.8 2.4 2.8" />
+      <path d="M15.4 7.2c.18 1.3.8 2 1.7 2" />
+    </Icon>
+  );
+}
+
+// 商店売り場: 鍋。蓋つきの丸い鍋。
+export function ShopPotIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M7 11.5h10v5.2c0 1.8-2.2 3.3-5 3.3s-5-1.5-5-3.3V11.5Z" />
+      <path d="M6 11.5h12" />
+      <path d="M9 11.5V9.6c0-.8.7-1.4 1.5-1.4h3c.8 0 1.5.6 1.5 1.4v1.9" />
+      <path d="M12 8.2V6.6" />
+      <path d="M4.8 13.4h2.2M17 13.4h2.2" />
+    </Icon>
+  );
+}
+
+// 商店売り場: 道具。平たいへら。歯車(設定)・おたま(お世話)と混ぜない。
+export function ShopToolIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M14.5 4.8 8.2 11.1c-.8.8-.8 2 0 2.8l1.9 1.9c.8.8 2 .8 2.8 0l6.3-6.3" />
+      <path d="M13.2 6.1 17.9 10.8" />
+      <path d="M7.4 16.8 5.6 18.6" />
+    </Icon>
+  );
+}
+
+// 商店売り場: おたすけ。一滴。
+export function ShopAssistIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 4.6c2.8 3.4 5.4 6.2 5.4 9.1a5.4 5.4 0 0 1-10.8 0c0-2.9 2.6-5.7 5.4-9.1Z" />
+      <path d="M9.6 12.6c.5-1.2 1.4-1.8 2.6-2" />
+    </Icon>
+  );
+}
+
+// 商店売り場: 飾り。小さな吊り飾り。
+export function ShopDecorationIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3.6v3.2" />
+      <path d="M8.2 8.4h7.6l-1.1 8.2c-.2 1.4-1.6 2.4-3.1 2.4h-.2c-1.5 0-2.9-1-3.1-2.4L8.2 8.4Z" />
+      <path d="M10.2 11.4h3.6" />
+    </Icon>
+  );
+}
+
+// 商店wallet: 同心円の硬貨記号。数値は呼び出し側のテキストで出す。
+export function ShopCoinIcon(props) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="4.6" />
+      <circle cx="12" cy="12" r="1.15" />
+    </Icon>
+  );
+}
+
+// 商店看板: 暖簾紋。BottomNavのShopIcon(暖簾+店)とは別物。
+export function ShopNorenCrestIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M3.8 5.2h16.4" />
+      <path d="M5.4 5.2v11.2c0 1.3.7 2 1.6 2s1.6-.7 1.6-2V5.2" />
+      <path d="M10.8 5.2v11.2c0 1.3.7 2 1.6 2s1.6-.7 1.6-2V5.2" />
+      <path d="M16.2 5.2v11.2c0 1.3.7 2 1.6 2s1.6-.7 1.6-2V5.2" />
+    </Icon>
+  );
+}
