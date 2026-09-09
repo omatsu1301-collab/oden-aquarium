@@ -1,0 +1,44 @@
+/* 商店専用の控えめな木枠と灯り。NightBackdropの提灯・暖簾・窓は引き伸ばさない。 */
+.shop-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.shop-backdrop__glow {
+  position: absolute;
+  top: -6%;
+  left: 18%;
+  width: 64%;
+  height: 26%;
+  background: radial-gradient(ellipse at center, rgba(255, 216, 138, 0.24), transparent 72%);
+}
+
+.shop-backdrop__eave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 11px;
+  background: linear-gradient(180deg, #2a160a 0%, #6b4423 52%, #432a15 100%);
+  box-shadow: 0 8px 14px rgba(20, 10, 4, 0.28);
+}
+
+.shop-backdrop__post {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(90deg, #2a160a, #6b4423 45%, #432a15);
+  opacity: 0.5;
+}
+
+.shop-backdrop__post--left {
+  left: 0;
+}
+
+.shop-backdrop__post--right {
+  right: 0;
+}

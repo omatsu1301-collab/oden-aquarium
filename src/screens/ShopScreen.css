@@ -2,6 +2,7 @@
   position: relative;
   flex: 1;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   /* NightBackdrop は inset:0 のため一覧が長いと終端より下が透明になり、背後の生成り色が露出する。 */
   background-color: var(--night-shelf-dark);
@@ -10,60 +11,128 @@
 .shop-screen__content {
   position: relative;
   z-index: 1;
-  padding: calc(env(safe-area-inset-top, 0) + var(--space-4)) var(--space-4) var(--space-5);
+  padding: calc(env(safe-area-inset-top, 0) + var(--space-4)) var(--space-4) var(--space-6);
 }
 
 .shop-screen__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2);
   margin-bottom: var(--space-3);
   /* NightBackdropの提灯(左上、幅15%・最大64px)と重ならないよう余白を空ける。 */
   padding-left: max(15%, 64px);
 }
+
+.shop-screen__sign {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #8a5c34 0%, #5c3a1e 58%, #432a15 100%);
+  border: 1px solid rgba(255, 216, 138, 0.42);
+  box-shadow:
+    0 0 14px rgba(255, 216, 138, 0.22),
+    inset 0 1px 0 rgba(255, 232, 186, 0.28);
+  color: var(--night-text);
+}
+
+.shop-screen__sign-crest {
+  flex-shrink: 0;
+  color: var(--night-lantern);
+}
+
+.shop-screen__sign-text {
+  min-width: 0;
+}
+
 .shop-screen__title {
   margin: 0;
   font-size: var(--font-title);
   font-weight: 800;
   color: var(--night-text);
+  line-height: 1.15;
 }
+
 .shop-screen__subtitle {
   margin: 2px 0 0;
   font-size: var(--font-small);
   color: var(--night-text-muted);
 }
+
 .shop-screen__wallet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
-  background: rgba(20, 12, 4, 0.55);
+  background: rgba(20, 12, 4, 0.62);
   color: #ffd88a;
   font-weight: 800;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: var(--radius-pill);
   font-size: var(--font-small);
+  border: 1px solid rgba(255, 216, 138, 0.28);
+}
+
+.shop-screen__wallet-coin {
+  flex-shrink: 0;
+  color: var(--night-lantern);
+}
+
+.shop-screen__wallet-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-screen__wallet-unit {
+  font-weight: 700;
 }
 
 .shop-screen__tabs {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
   margin-bottom: var(--space-3);
-  padding-bottom: 2px;
 }
+
 .shop-screen__tab {
-  flex-shrink: 0;
-  min-height: 40px;
-  padding: 0 16px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: rgba(255, 250, 235, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 4px 2px;
+  border: 1px solid rgba(253, 241, 222, 0.2);
+  border-radius: var(--radius-md);
+  background: rgba(20, 12, 4, 0.38);
   color: var(--night-text);
   font-weight: 700;
   cursor: pointer;
 }
+
+.shop-screen__tab-icon {
+  flex-shrink: 0;
+}
+
+.shop-screen__tab-label {
+  font-size: 10.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .shop-screen__tab.is-active {
   background: var(--color-accent);
   color: var(--color-accent-contrast);
+  border-color: var(--color-accent);
+}
+
+.shop-screen__tab:focus-visible,
+.shop-item-card:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
 }
 
 .shop-screen__lead {
@@ -84,35 +153,88 @@
   align-items: center;
   gap: 4px;
   padding: var(--space-3);
-  border: none;
+  border: 1px solid rgba(92, 58, 30, 0.38);
   border-radius: var(--radius-md);
-  background: rgba(255, 250, 235, 0.92);
+  background: var(--color-surface);
+  box-shadow: 0 3px 0 #5c3a1e, var(--shadow-card);
   cursor: pointer;
   text-align: center;
+  color: var(--color-text);
 }
+
+.shop-item-card.is-active {
+  box-shadow: 0 0 0 2px var(--color-accent), 0 3px 0 #5c3a1e;
+}
+
 .shop-item-card__icon {
-  font-size: 30px;
+  color: var(--night-shelf);
 }
+
 .shop-item-card__name {
   font-weight: 800;
   font-size: var(--font-body);
   color: var(--color-text);
 }
+
 .shop-item-card__tagline {
   font-size: 10.5px;
   color: var(--color-text-muted);
   min-height: 2.4em;
 }
-.shop-item-card__price {
-  font-weight: 700;
-  color: var(--color-accent-strong);
-  font-size: var(--font-small);
-}
+
 .shop-item-card__status {
-  font-size: var(--font-small);
-  color: var(--color-text-muted);
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
 }
+
 .shop-item-card__status.is-active {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  border-radius: var(--radius-pill);
+}
+
+.shop-item-card__status.is-owned {
+  color: var(--color-text);
+  border: 1.5px solid var(--night-shelf);
+  border-radius: 4px;
+  background: rgba(255, 250, 235, 0.7);
+}
+
+.shop-item-card__status.is-purchasable {
+  color: var(--color-accent-contrast);
+  background: rgba(242, 193, 78, 0.22);
+  border: 1.5px dashed var(--color-accent-strong);
+  border-radius: var(--radius-pill);
+}
+
+.shop-item-card__status.is-shortfall {
+  color: var(--color-danger);
+  background: rgba(181, 72, 47, 0.1);
+  border: 1.5px solid var(--color-danger);
+  border-radius: 2px 10px 2px 10px;
+}
+
+.shop-item-card__price {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
   color: var(--color-accent-strong);
+  font-size: var(--font-small);
+}
+
+@media (max-width: 360px) {
+  .shop-screen__tab-label {
+    font-size: 10px;
+  }
+
+  .shop-screen__title {
+    font-size: 20px;
+  }
 }
