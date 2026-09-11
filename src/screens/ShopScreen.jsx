@@ -58,7 +58,7 @@ export function ShopScreen({ state, onOpenItemDetail }) {
           </div>
         </div>
 
-        <div className="shop-screen__tabs" role="tablist" aria-label="商店カテゴリ">
+        <div className="shop-screen__tabs" role="group" aria-label="商店カテゴリ">
           {SHOP_TABS.map((tab) => (
             <button
               key={tab.id}

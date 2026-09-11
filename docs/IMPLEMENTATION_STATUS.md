@@ -758,7 +758,7 @@ Wave 1B用branch作成、AI画像生成、Instruction 16実装、Wave 2、商品
 - 状態: **Draft PR作成済み。Ready化・merge・production deploy・Wave 2には未着手。**
 - branch: `feat/phase3-wave1c-shop-final-art`
 - base SHA: `c800716b32428fb0a98ee91482339101e5f26eec`(PR #15 merge / main)
-- head SHA: `f44711c0daa9fa8c9bcad2e1fc6bb01634cdaeb4`
+- implementation SHA: `f44711c0daa9fa8c9bcad2e1fc6bb01634cdaeb4`
 - Draft PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/16
 - Vercel Preview: https://oden-aquarium-git-feat-phase3-wave1c-s-815123-omatsu1301-collab.vercel.app (Ready)
 - Visual Gate(Wave 1B): PASS。背景C・改訂icon system・16/20/24px・代表モックアップを採用。

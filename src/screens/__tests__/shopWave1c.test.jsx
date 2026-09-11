@@ -77,14 +77,20 @@ describe("Wave 1C shop category icons", () => {
 });
 
 describe("Wave 1C ShopScreen contracts", () => {
-  it("初期選択tabはaria-pressed=trueで、5labelを表示する", () => {
+  it("category containerはrole=groupで、5buttonとaria-pressed契約を維持する", () => {
     const html = renderToStaticMarkup(
       createElement(ShopScreen, {
         state: makeState(),
         onOpenItemDetail: () => {},
       }),
     );
-    expect(html).toContain("aria-pressed=\"true\"");
+    expect(html).toContain('role="group"');
+    expect(html).toContain('aria-label="商店カテゴリ"');
+    expect(html).not.toContain('role="tablist"');
+    expect(html).not.toContain('role="tab"');
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).toContain('aria-pressed="false"');
+    expect((html.match(/class="shop-screen__tab(?: is-active)?"/g) || []).length).toBe(5);
     for (const label of ["出汁", "鍋", "道具", "おたすけ", "飾り"]) {
       expect(html).toContain(label);
     }
