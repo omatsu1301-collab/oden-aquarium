@@ -1,34 +1,19 @@
-// 商店画面(仕様6.4)。Instruction 15: 商店shellの代表実装。
+// 商店画面(仕様6.4)。Instruction 16: 採用済み最終美術をPR #15 shellへ接続。
 // 商品詳細はAppShellのpanel(history連携)経由で開く。商品データとgame actionは変えない。
 import { useState } from "react";
 import { ShopBackdrop } from "../components/ShopBackdrop.jsx";
 import { SHOP_TABS, getShopTabItems } from "../data/shopCatalog.js";
-import {
-  ShopAssistIcon,
-  ShopBrothIcon,
-  ShopCoinIcon,
-  ShopDecorationIcon,
-  ShopNorenCrestIcon,
-  ShopPotIcon,
-  ShopToolIcon,
-} from "../icons/Icons.jsx";
+import { ShopCoinIcon, ShopNorenCrestIcon } from "../icons/Icons.jsx";
+import { SHOP_CATEGORY_ICONS } from "../presentation/shopCategoryIcons.js";
 import { getShopCardDisplayStatus } from "../presentation/shopCardStatus.js";
 import "./ShopScreen.css";
 
-const CATEGORY_ICONS = {
-  broth: ShopBrothIcon,
-  pot: ShopPotIcon,
-  tool: ShopToolIcon,
-  assist: ShopAssistIcon,
-  decoration: ShopDecorationIcon,
-};
-
 function ShopCategoryIcon({ category, size, className }) {
-  const Icon = CATEGORY_ICONS[category] ?? ShopDecorationIcon;
+  const Icon = SHOP_CATEGORY_ICONS[category] ?? SHOP_CATEGORY_ICONS.decoration;
   return <Icon className={className} size={size} aria-hidden="true" />;
 }
 
-function ShopItemCard({ item, state, onOpen }) {
+export function ShopItemCard({ item, state, onOpen }) {
   const status = getShopCardDisplayStatus(item, state);
   const showPrice = status.kind === "purchasable" || status.kind === "shortfall";
   return (
@@ -37,7 +22,7 @@ function ShopItemCard({ item, state, onOpen }) {
       className={`shop-item-card is-${status.kind}`}
       onClick={() => onOpen(item.id)}
     >
-      <ShopCategoryIcon category={item.category} size={24} className="shop-item-card__icon" />
+      <span className="shop-item-card__media" aria-hidden="true" />
       <span className="shop-item-card__name">{item.name}</span>
       <span className="shop-item-card__tagline">{item.tagline}</span>
       <span className={`shop-item-card__status is-${status.kind}`}>{status.label}</span>
@@ -56,8 +41,8 @@ export function ShopScreen({ state, onOpenItemDetail }) {
 
   return (
     <div className="shop-screen">
-      <ShopBackdrop />
       <div className="shop-screen__content">
+        <ShopBackdrop />
         <div className="shop-screen__header">
           <div className="shop-screen__sign">
             <ShopNorenCrestIcon className="shop-screen__sign-crest" size={22} aria-hidden="true" />
@@ -73,7 +58,7 @@ export function ShopScreen({ state, onOpenItemDetail }) {
           </div>
         </div>
 
-        <div className="shop-screen__tabs">
+        <div className="shop-screen__tabs" role="tablist" aria-label="商店カテゴリ">
           {SHOP_TABS.map((tab) => (
             <button
               key={tab.id}

@@ -752,3 +752,78 @@ AI生成・Visual Gateを経て全面更新する。
 クローズ状態更新のみを独立commitしてからmergeする。次工程はPhase 3 Wave 1B。
 Wave 1B用branch作成、AI画像生成、Instruction 16実装、Wave 2、商品26件の個別美術には
 このクローズ工程では着手しない。
+
+## Instruction 16「Phase 3 Wave 1C — 商店最終美術のproduction化とshell接続」
+
+- 状態: **Draft PR作成済み。Ready化・merge・production deploy・Wave 2には未着手。**
+- branch: `feat/phase3-wave1c-shop-final-art`
+- base SHA: `c800716b32428fb0a98ee91482339101e5f26eec`(PR #15 merge / main)
+- Visual Gate(Wave 1B): PASS。背景C・改訂icon system・16/20/24px・代表モックアップを採用。
+
+### 採用事実
+
+- 背景: Candidate C採用。
+- category icon: 改訂System B採用。
+- 16 / 20 / 24px contact sheet: PASS。
+- 390px代表モックアップ: 採用(美術階層の参照。pixel-perfect写経ではない)。
+- 代表モックアップの商品card上の共通出汁iconは採用対象外。
+
+### source asset
+
+| File | Dimensions | SHA-256 |
+|---|---|---|
+| `shop-background-C-adopted-master.png` | 1024×1536 | `55ef7196ad1f799aaa95c3ef33b82423134d2672dbaff8df5de414a103282326` |
+| `shop-category-icons-adopted-styleboard.png` | 1254×1254 | `be8d8fb52b8e7bd476f18c44edc850a4f92cafad4134c44929a66d79e889cda0` |
+| `shop-category-icons-legibility-16-20-24.png` | 760×650 | `24cf5c0c27bb62a9c29ad8e1825ff7c6d39827e33c3668a3122c06ce9c4d9928` |
+| `shop-shell-representative-mockup-adopted.png` | 941×1672 | `75387fe28dba93fb5c58d82f4941d62d14f872daa9092924a1c19b54b464f0b1` |
+
+master PNGはrepositoryへcommitしていない(handoff入力のみ)。
+
+### production asset
+
+変換: `sharp` WebP `quality:92` `effort:6`。sceneは master 上部 1024×960、woodは装飾のない濃茶帯 y=1184 高さ288。
+
+| File | Dimensions | Bytes | SHA-256 |
+|---|---|---:|---|
+| `public/assets/shop/shop-artisan-night-scene.webp` | 1024×960 | 179366 | `fb8089f530c57827b2dc675fa3fbcacdd47c9e6120c39cb67604e4886bb6524d` |
+| `public/assets/shop/shop-artisan-night-wood.webp` | 1024×288 | 19326 | `753d6666ffafbb5178a7bccb35845fb6424e25b5ecd757e8128767e2108076d8` |
+
+合計 198692 bytes(約194KB)。目標budget 450KB以下。
+
+### icon contract
+
+- inline SVG(`src/icons/Icons.jsx`)。styleboardのraster縮小は不使用。
+- `viewBox="0 0 24 24"` / `currentColor` / round cap・join。
+- tabのみに割当(`src/presentation/shopCategoryIcons.js`)。cardへcategory iconを繰り返さない。
+- motif: 出汁=浅いだし器+湯気+液面 / 鍋=蓋つき小鍋 / 道具=おたま+箸交差 / おたすけ=陶器瓶+雫+輝き / 飾り=低い台+丸石+輝き。
+
+### PR #15から維持した構造
+
+- ShopBackdrop責務境界(商店scope完結。Catalog/NightBackdropは無変更)。
+- header / wallet / 5tab / 2列card。
+- `使用中` / `所持` / `購入可能` / `残高不足`。
+- 商品詳細の既存panel導線。
+- BottomNav構造・画面遷移。
+- 価格・商品data・保存schema・game logicは無変更。
+
+### 変更要約
+
+- `ShopBackdrop`: 採用背景Cのscene+wood WebP。NightBackdrop合成をやめ商店専用化。
+- shell CSS: 看板(木枠+和紙)、wallet、tab、和紙card、neutral media slot。
+- category SVG 5種を採用motifへ再構成。
+- Wave 1C contract testを追加。
+
+### scope外(未着手)
+
+- 商品26件の個別美術。
+- 新機能、価格・商品data・保存schema・game logic変更。
+- Ready化、merge、production deploy、Wave 2。
+
+### 検証
+
+- `npm test`: 128 passed。
+- `npm run verify:derive`: OK。
+- `npm run lint`: 警告なし。
+- `npm run build`(Pages `/oden-aquarium/`) と `npm run build -- --base=/`(Vercel): 成功。
+- browser回帰(360 / 390 / 430): PASS。asset 200、horizontal overflowなし、cardにcategory fallback/broken imageなし、5tab・4status・detail開閉確認。
+- ローカルscreenshot(未commit): `_artifacts/wave1c/390-top.png` / `390-mid.png` / `390-bottom.png` / `360-top.png` / `430-top.png`。
