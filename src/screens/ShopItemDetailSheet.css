@@ -1,3 +1,7 @@
+.shop-detail__media {
+  margin: 0 0 var(--space-3);
+}
+
 .shop-detail__tagline {
   color: var(--color-text-muted);
   margin: 0 0 var(--space-3);
@@ -24,6 +28,18 @@
   text-align: center;
   color: var(--color-text-muted);
   font-weight: 700;
+}
+.shop-detail__pot-capacity {
+  font-size: var(--font-small);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+  text-align: center;
+}
+.shop-detail__assist-reason {
+  color: var(--color-danger);
+  font-size: var(--font-small);
+  text-align: center;
+  margin: 6px 0 0;
 }
 .shop-detail__bowl-targets-lead {
   font-size: var(--font-small);

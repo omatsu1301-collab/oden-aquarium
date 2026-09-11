@@ -1,5 +1,6 @@
 // presentation層: 商店カードの表示状態だけを決める純粋関数。
 // 購入・装備・使用・消費の game action は呼ばない。PR #13 の effectCategory 契約を使う。
+import { isBowlDecorationActive } from "./bowlApplyTargets.js";
 import { getShopAssistUseState } from "./shopAssistState.js";
 
 function isShopItemActive(item, state) {
@@ -14,6 +15,9 @@ function isShopItemActive(item, state) {
   }
   if (item.category === "decoration" && item.slotType === "tank") {
     return state.tank.decorationId === item.id;
+  }
+  if (item.category === "decoration" && item.slotType === "bowl") {
+    return isBowlDecorationActive(item, state);
   }
   if (item.category === "assist") {
     const owned = state.inventory.consumables[item.id] ?? 0;

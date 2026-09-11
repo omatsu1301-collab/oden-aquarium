@@ -855,3 +855,34 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 - `npm run build`(Pages `/oden-aquarium/`) と `npm run build -- --base=/`(Vercel): 成功。
 - browser回帰(360 / 390 / 430): PASS。asset 200、horizontal overflowなし、cardにcategory fallback/broken imageなし、5tab・4status・detail開閉確認。
 - ローカルscreenshot(未commit): `_artifacts/wave1c/390-top.png` / `390-mid.png` / `390-bottom.png` / `360-top.png` / `430-top.png`。
+
+### クローズ記録(2026-09-11)
+
+- Wave 1C Visual Gate: PASS(ユーザー採用)
+- 独立技術監査: PASS
+- PR #16: 通常merge commit `c064d414ec85c4ab1aff5fb15f83f86ea7eab689`
+- GitHub Pages deploy: success
+- Vercel Production: success
+- 次工程: Milestone 2「商店Full Graybox Completion」
+
+## Milestone 2「商店Full Graybox Completion」
+
+- 状態: **Draft PR作成へ進行中**
+- branch: `feat/phase3-m2-shop-full-graybox`
+- base / PR #16 merge SHA: `c064d414ec85c4ab1aff5fb15f83f86ea7eab689`
+- 目的: 新規画像生成なしで、既存assetとneutral placeholderにより26商品の購入・所持・使用/装備・解除/切替・reload復元までを一連で完成させる。
+
+### 完成した操作経路
+
+- 一覧 / 詳細 / 購入 / 所持反映 / 使用または装備 / 使用中表示 / 解除・切替 / reload復元
+- 4status維持、assist disabled理由、bowl適用対象0/1/5、出汁残量0、decoration装着/解除
+- detail/cardのneutral media slot。既存の出汁・おたすけ・小鍋assetのみ任意表示。読込失敗時はimgを隠しslotを維持(CLSなし)
+
+### 維持した契約
+
+- PR #13 assist分類、PR #14背景fallback、PR #15 shell、PR #16背景C/SVG/neutral slot
+- 価格・商品data・保存schema・game logicの変更なし
+
+### scope外
+
+- 商品26件の個別美術、新キャラ、収益機能、Milestone 3
