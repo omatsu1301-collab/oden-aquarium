@@ -1,17 +1,15 @@
-// 商店専用背景候補。共有NightBackdropは変更せず、その上へCSS装飾だけを重ねる。
-import { NightBackdrop } from "./NightBackdrop.jsx";
+// 商店専用背景(Wave 1C)。採用背景Cのscene＋woodを商店scopeだけで完結させる。
+// 共有NightBackdrop / CatalogNightBackdropは変更・流用しない。
 import "./ShopBackdrop.css";
+
+const SCENE_URL = `${import.meta.env.BASE_URL}assets/shop/shop-artisan-night-scene.webp`;
+const WOOD_URL = `${import.meta.env.BASE_URL}assets/shop/shop-artisan-night-wood.webp`;
 
 export function ShopBackdrop() {
   return (
-    <>
-      <NightBackdrop />
-      <div className="shop-backdrop" aria-hidden="true">
-        <div className="shop-backdrop__glow" />
-        <div className="shop-backdrop__eave" />
-        <div className="shop-backdrop__post shop-backdrop__post--left" />
-        <div className="shop-backdrop__post shop-backdrop__post--right" />
-      </div>
-    </>
+    <div className="shop-backdrop" aria-hidden="true">
+      <div className="shop-backdrop__wood" style={{ backgroundImage: `url("${WOOD_URL}")` }} />
+      <img src={SCENE_URL} alt="" className="shop-backdrop__scene" draggable={false} />
+    </div>
   );
 }

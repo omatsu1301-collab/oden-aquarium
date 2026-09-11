@@ -4,7 +4,7 @@
   min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  /* NightBackdrop は inset:0 のため一覧が長いと終端より下が透明になり、背後の生成り色が露出する。 */
+  /* scene/woodより下が透けた場合の最終fallback。PR #14連続性を維持。 */
   background-color: var(--night-shelf-dark);
 }
 
@@ -15,13 +15,13 @@
 }
 
 .shop-screen__header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-2);
   margin-bottom: var(--space-3);
-  /* NightBackdropの提灯(左上、幅15%・最大64px)と重ならないよう余白を空ける。 */
-  padding-left: max(15%, 64px);
 }
 
 .shop-screen__sign {
@@ -29,37 +29,41 @@
   align-items: center;
   gap: 8px;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 3px;
   border-radius: 12px;
-  background: linear-gradient(180deg, #8a5c34 0%, #5c3a1e 58%, #432a15 100%);
-  border: 1px solid rgba(255, 216, 138, 0.42);
+  background: linear-gradient(180deg, #6b4423 0%, #432a15 55%, #2a160a 100%);
+  border: 1px solid rgba(255, 216, 138, 0.28);
   box-shadow:
-    0 0 14px rgba(255, 216, 138, 0.22),
-    inset 0 1px 0 rgba(255, 232, 186, 0.28);
-  color: var(--night-text);
+    0 4px 12px rgba(20, 10, 4, 0.35),
+    inset 0 1px 0 rgba(255, 232, 186, 0.18);
 }
 
 .shop-screen__sign-crest {
   flex-shrink: 0;
-  color: var(--night-lantern);
+  margin-left: 8px;
+  color: #8a5c34;
 }
 
 .shop-screen__sign-text {
   min-width: 0;
+  padding: 6px 12px 6px 4px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #f4ead4 0%, #e8d7b6 100%);
+  box-shadow: inset 0 0 0 1px rgba(74, 48, 24, 0.12);
 }
 
 .shop-screen__title {
   margin: 0;
   font-size: var(--font-title);
   font-weight: 800;
-  color: var(--night-text);
+  color: #4a3018;
   line-height: 1.15;
 }
 
 .shop-screen__subtitle {
   margin: 2px 0 0;
   font-size: var(--font-small);
-  color: var(--night-text-muted);
+  color: #6b4f30;
 }
 
 .shop-screen__wallet {
@@ -67,13 +71,14 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  background: rgba(20, 12, 4, 0.62);
+  background: linear-gradient(180deg, #3a2412 0%, #24150a 100%);
   color: #ffd88a;
   font-weight: 800;
   padding: 8px 12px;
   border-radius: var(--radius-pill);
   font-size: var(--font-small);
-  border: 1px solid rgba(255, 216, 138, 0.28);
+  border: 1px solid rgba(255, 216, 138, 0.38);
+  box-shadow: 0 2px 8px rgba(10, 5, 2, 0.35);
 }
 
 .shop-screen__wallet-coin {
@@ -90,6 +95,8 @@
 }
 
 .shop-screen__tabs {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
@@ -105,12 +112,13 @@
   min-width: 0;
   min-height: var(--tap-min);
   padding: 4px 2px;
-  border: 1px solid rgba(253, 241, 222, 0.2);
-  border-radius: var(--radius-md);
-  background: rgba(20, 12, 4, 0.38);
+  border: 1px solid rgba(42, 22, 10, 0.55);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #6b4423 0%, #432a15 100%);
   color: var(--night-text);
   font-weight: 700;
   cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 232, 186, 0.12);
 }
 
 .shop-screen__tab-icon {
@@ -124,9 +132,18 @@
 }
 
 .shop-screen__tab.is-active {
-  background: var(--color-accent);
+  background: linear-gradient(180deg, #ffe7a8 0%, #f2c14e 100%);
   color: var(--color-accent-contrast);
-  border-color: var(--color-accent);
+  border-color: #dfa62b;
+  box-shadow:
+    0 0 0 1px rgba(255, 232, 186, 0.55),
+    0 0 14px rgba(255, 216, 138, 0.35),
+    inset 0 1px 0 rgba(255, 250, 235, 0.7);
+}
+
+.shop-screen__tab:hover:not(.is-active) {
+  border-color: rgba(255, 216, 138, 0.45);
+  color: #fff6e4;
 }
 
 .shop-screen__tab:focus-visible,
@@ -135,13 +152,21 @@
   outline-offset: 2px;
 }
 
+.shop-screen__tab:active {
+  transform: translateY(1px);
+}
+
 .shop-screen__lead {
+  position: relative;
+  z-index: 1;
   color: var(--night-text-muted);
   font-size: var(--font-small);
   margin: 0 0 var(--space-3);
 }
 
 .shop-screen__grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
@@ -150,24 +175,52 @@
 .shop-item-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 4px;
-  padding: var(--space-3);
-  border: 1px solid rgba(92, 58, 30, 0.38);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: 0 3px 0 #5c3a1e, var(--shadow-card);
+  padding: 10px;
+  border: 1px solid rgba(92, 58, 30, 0.28);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0.92), rgba(244, 234, 212, 0.94)),
+    #f4ead4;
+  box-shadow:
+    0 2px 0 #5c3a1e,
+    0 4px 12px rgba(30, 15, 3, 0.22);
   cursor: pointer;
-  text-align: center;
+  text-align: left;
   color: var(--color-text);
 }
 
 .shop-item-card.is-active {
-  box-shadow: 0 0 0 2px var(--color-accent), 0 3px 0 #5c3a1e;
+  border-color: #dfa62b;
+  box-shadow:
+    0 0 0 2px var(--color-accent),
+    0 2px 0 #5c3a1e,
+    0 0 14px rgba(255, 216, 138, 0.28);
 }
 
-.shop-item-card__icon {
-  color: var(--night-shelf);
+.shop-item-card.is-shortfall {
+  border-style: solid;
+}
+
+.shop-item-card.is-purchasable {
+  border-style: solid;
+}
+
+.shop-item-card__media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(232, 215, 182, 0.55), rgba(210, 186, 148, 0.4)),
+    repeating-linear-gradient(
+      -12deg,
+      rgba(92, 58, 30, 0.03) 0 2px,
+      rgba(92, 58, 30, 0) 2px 6px
+    );
+  border: 1px solid rgba(92, 58, 30, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 250, 235, 0.55);
 }
 
 .shop-item-card__name {
@@ -186,6 +239,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
   min-height: 22px;
   padding: 2px 8px;
   font-size: 11px;
@@ -236,5 +290,11 @@
 
   .shop-screen__title {
     font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-screen__tab:active {
+    transform: none;
   }
 }
