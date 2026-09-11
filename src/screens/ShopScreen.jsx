@@ -1,11 +1,13 @@
-// 商店画面(仕様6.4)。Instruction 16: 採用済み最終美術をPR #15 shellへ接続。
+// 商店画面(仕様6.4)。Instruction 16美術 + Milestone 2 Full Graybox操作経路。
 // 商品詳細はAppShellのpanel(history連携)経由で開く。商品データとgame actionは変えない。
 import { useState } from "react";
 import { ShopBackdrop } from "../components/ShopBackdrop.jsx";
+import { ShopMediaSlot } from "../components/ShopMediaSlot.jsx";
 import { SHOP_TABS, getShopTabItems } from "../data/shopCatalog.js";
 import { ShopCoinIcon, ShopNorenCrestIcon } from "../icons/Icons.jsx";
 import { SHOP_CATEGORY_ICONS } from "../presentation/shopCategoryIcons.js";
 import { getShopCardDisplayStatus } from "../presentation/shopCardStatus.js";
+import { getShopItemImageUrl } from "../presentation/shopItemMedia.js";
 import "./ShopScreen.css";
 
 function ShopCategoryIcon({ category, size, className }) {
@@ -22,7 +24,7 @@ export function ShopItemCard({ item, state, onOpen }) {
       className={`shop-item-card is-${status.kind}`}
       onClick={() => onOpen(item.id)}
     >
-      <span className="shop-item-card__media" aria-hidden="true" />
+      <ShopMediaSlot src={getShopItemImageUrl(item)} className="shop-item-card__media" />
       <span className="shop-item-card__name">{item.name}</span>
       <span className="shop-item-card__tagline">{item.tagline}</span>
       <span className={`shop-item-card__status is-${status.kind}`}>{status.label}</span>

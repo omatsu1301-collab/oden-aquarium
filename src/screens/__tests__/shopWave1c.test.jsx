@@ -96,7 +96,7 @@ describe("Wave 1C ShopScreen contracts", () => {
     }
   });
 
-  it("商品cardはneutral media slotを持ち、category iconやimgを出さない", () => {
+  it("商品cardはneutral media slotを持ち、category icon fallbackを出さない", () => {
     const html = renderToStaticMarkup(
       createElement(ShopItemCard, {
         item: KOMBU,
@@ -104,10 +104,22 @@ describe("Wave 1C ShopScreen contracts", () => {
         onOpen: () => {},
       }),
     );
-    expect(html).toContain("shop-item-card__media");
-    expect(html).not.toContain("<img");
+    expect(html).toContain("shop-media-slot");
     expect(html).not.toContain("shop-item-card__icon");
-    expect(html).not.toContain("viewBox");
+    expect(html).not.toContain('viewBox="0 0 24 24"');
+  });
+
+  it("画像URLのない商品cardはimgを出さずslotだけを残す", () => {
+    const pot = getShopItem("clay");
+    const html = renderToStaticMarkup(
+      createElement(ShopItemCard, {
+        item: pot,
+        state: makeState(),
+        onOpen: () => {},
+      }),
+    );
+    expect(html).toContain("shop-media-slot");
+    expect(html).not.toContain("<img");
   });
 
   it("商品card clickで既存detail openへitem.idを渡す", () => {

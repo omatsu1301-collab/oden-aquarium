@@ -103,6 +103,17 @@ describe("getShopCardDisplayStatus", () => {
     expect(status).toMatchObject({ kind: "purchasable", label: "購入可能", price: 80 });
   });
 
+  it("器をいずれかの具材へ適用中なら使用中", () => {
+    const state = makeState({
+      ownedIds: ["kombu", "clay", "bowl-white", "bowl-indigo"],
+    });
+    state.catalog = {
+      daikon: { firstSeenAt: 1, harvestCount: 1, bowlId: "bowl-indigo", favorite: false, brothCounts: {} },
+    };
+    expect(getShopCardDisplayStatus(getShopItem("bowl-indigo"), state).label).toBe("使用中");
+    expect(getShopCardDisplayStatus(BOWL_WHITE, state).label).toBe("所持");
+  });
+
   it("game actionや保存状態を変更しない", () => {
     const state = makeState({ wallet: 300, consumables: { drop: 1 } });
     const frozenWallet = state.wallet;
