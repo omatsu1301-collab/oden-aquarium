@@ -919,7 +919,7 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 | ID | Category | Source | Production |
 |---|---|---|---|
 | `kombu` | 出汁 | 既存再利用 | `public/assets/items/broth-kombu.webp` |
-| `copper` | 鍋 | `shop-item-pot-copper-pilot.png` 1024?→1254×1254 SHA `9a381b69…d9e4` | `public/assets/items/pot-copper.webp` |
+| `copper` | 鍋 | `shop-item-pot-copper-pilot.png` 1254×1254 SHA `9a381b69…d9e4` | `public/assets/items/pot-copper.webp` |
 | `paddle` | 道具 | `shop-item-tool-paddle-pilot.png` 1254×1254 SHA `b91d5afd…6443` | `public/assets/items/tool-paddle.webp` |
 | `drop` | おたすけ | 既存再利用 | `public/assets/items/assist-drop.webp` |
 | `bowl-indigo` | 飾り | 既存再利用 | `public/assets/bowls/bowl-indigo.webp` |
