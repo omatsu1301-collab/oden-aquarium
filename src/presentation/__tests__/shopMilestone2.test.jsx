@@ -168,8 +168,9 @@ describe("Milestone 2 media / detail contracts", () => {
     expect(getShopItemImageUrl(getShopItem("kombu"))).toContain("broth-kombu.webp");
     expect(getShopItemImageUrl(getShopItem("drop"))).toContain("assist-drop.webp");
     expect(getShopItemImageUrl(getShopItem("bowl-white"))).toContain("bowl-white.webp");
+    expect(getShopItemImageUrl(getShopItem("copper"))).toContain("pot-copper.webp");
+    expect(getShopItemImageUrl(getShopItem("paddle"))).toContain("tool-paddle.webp");
     expect(getShopItemImageUrl(getShopItem("clay"))).toBeNull();
-    expect(getShopItemImageUrl(getShopItem("paddle"))).toBeNull();
     expect(getShopItemImageUrl(getShopItem("pebble"))).toBeNull();
   });
 
