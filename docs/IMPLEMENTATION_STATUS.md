@@ -755,13 +755,38 @@ Wave 1B用branch作成、AI画像生成、Instruction 16実装、Wave 2、商品
 
 ## Instruction 16「Phase 3 Wave 1C — 商店最終美術のproduction化とshell接続」
 
-- 状態: **Draft PR作成済み。Ready化・merge・production deploy・Wave 2には未着手。**
+- 状態: **Wave 1C Visual Gate PASS / 独立技術監査PASS。通常mergeへ進む。**
 - branch: `feat/phase3-wave1c-shop-final-art`
 - base SHA: `c800716b32428fb0a98ee91482339101e5f26eec`(PR #15 merge / main)
 - implementation SHA: `f44711c0daa9fa8c9bcad2e1fc6bb01634cdaeb4`
 - Draft PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/16
 - Vercel Preview: https://oden-aquarium-git-feat-phase3-wave1c-s-815123-omatsu1301-collab.vercel.app (Ready)
 - Visual Gate(Wave 1B): PASS。背景C・改訂icon system・16/20/24px・代表モックアップを採用。
+
+### Wave 1C Visual Gate(2026-09-11)
+
+ユーザーがWave 1C Visual Gateを**採用**した。独立技術監査もPASS。
+
+採用したもの:
+
+- 背景Cのproduction接続
+- category icon(改訂System B / SVG)
+- shell styling(看板・wallet・tab・card)
+- neutral media slot(商品card上のcategory icon fallbackは非採用のまま)
+
+検証記録:
+
+- `npm test`: 128 passed
+- `npm run verify:derive`: OK
+- `npm run lint`: clean
+- Pages / Vercel 両base build: 成功
+
+判断: PR #16を通常merge(merge commit)する。squash / rebase / forceは使わない。
+
+未着手:
+
+- 商品26件の個別美術
+- Milestone 2「商店Full Graybox Completion」はmerge・deploy成功後に着手
 
 ### 採用事実
 
@@ -816,11 +841,11 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 - category SVG 5種を採用motifへ再構成。
 - Wave 1C contract testを追加。
 
-### scope外(未着手)
+### scope外(merge時点でも未着手)
 
 - 商品26件の個別美術。
 - 新機能、価格・商品data・保存schema・game logic変更。
-- Ready化、merge、production deploy、Wave 2。
+- Milestone 2以降は本記録のmerge完了後に別branchで着手。
 
 ### 検証
 
