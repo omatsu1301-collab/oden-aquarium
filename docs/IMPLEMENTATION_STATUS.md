@@ -867,11 +867,12 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 
 ## Milestone 2「商店Full Graybox Completion」
 
-- 状態: **Human Gate PASS / 独立技術監査PASS。通常mergeへ進む。**
+- 状態: **MERGED / Human Gate PASS / 独立技術監査PASS。商店機能・情報設計をlock。**
 - branch: `feat/phase3-m2-shop-full-graybox`
 - base / PR #16 merge SHA: `c064d414ec85c4ab1aff5fb15f83f86ea7eab689`
 - implementation SHA: `31fb63f9490f6257198b31a6c126df15c3323113`
-- Draft PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/17
+- PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/17
+- merge SHA: `cdb210b1127f0979f0c3c76a7c55b59852067e93`
 - 目的: 新規画像生成なしで、既存assetとneutral placeholderにより26商品の購入・所持・使用/装備・解除/切替・reload復元までを一連で完成させる。
 
 ### Human Gate(2026-09-11)
@@ -879,9 +880,15 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 - Milestone 2 Human Gate: **PASS**
 - 独立技術監査: **PASS**
 - Human Gateでの修正指摘: **0件**
-- 判断: 商店の機能・情報設計をlockする。PR #17を通常merge(merge commit)する。
+- 判断: 商店の機能・情報設計をlockする。PR #17を通常merge(merge commit)した。
 - Milestone 3: 修正項目0件のため**スキップ**(branch/空PRは作らない)。
 - 次工程: Milestone 4 Product Art Pilot
+
+### クローズ記録(2026-09-11)
+
+- GitHub Pages deploy: success
+- Vercel Production: success
+- Milestone 3スキップ確定
 
 ### 完成した操作経路
 
@@ -899,3 +906,60 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 - 商品26件の個別美術、新キャラ、収益機能
 - Milestone 3は修正0件のためスキップ
 - Milestone 4以降はmerge・deploy成功後に別branchで着手
+
+## Milestone 4「Product Art Pilot」
+
+- 状態: **MERGED / Technical Gate PASS / Visual Gate PASS。代表5商品のart directionをlock。**
+- branch: `feat/phase3-m4-product-art-pilot`
+- base / PR #17 merge SHA: `cdb210b1127f0979f0c3c76a7c55b59852067e93`
+- PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/18
+- head: `c5fb2f599add85936fe63282bca5fa44617907e8`
+- 目的: 代表5商品のproduct artをcard/detailへ仮接続し、Visual Gate用Previewを作る。
+
+### Gate結果(2026-09-12)
+
+- Technical Gate: **PASS**
+- Visual Gate: **PASS**
+- 採用代表5商品: `kombu` / `copper` / `paddle` / `drop` / `bowl-indigo`
+- 判断: 代表5商品のart directionを採用し、全商品量産基準として**lock**する。
+- Full Product Art Visual Audit: **26 / 26 PASS**（再生成対象 **0**）
+- Review Pack: `_artifacts/product-art-review-26/` / `ODEN_AQUARIUM_PRODUCT_ART_REVIEW_26_2026-09-12.zip`
+- 次工程: Full Product Art Rollout
+
+### 代表5商品 mapping
+
+| ID | Category | Source | Production |
+|---|---|---|---|
+| `kombu` | 出汁 | 既存再利用 | `public/assets/items/broth-kombu.webp` |
+| `copper` | 鍋 | `shop-item-pot-copper-pilot.png` 1254×1254 SHA `9a381b69…d9e4` | `public/assets/items/pot-copper.webp` |
+| `paddle` | 道具 | `shop-item-tool-paddle-pilot.png` 1254×1254 SHA `b91d5afd…6443` | `public/assets/items/tool-paddle.webp` |
+| `drop` | おたすけ | 既存再利用 | `public/assets/items/assist-drop.webp` |
+| `bowl-indigo` | 飾り | 既存再利用 | `public/assets/bowls/bowl-indigo.webp` |
+
+### 新規production出力
+
+変換: `sharp` resize 384×384 / WebP `quality:88` `alphaQuality:100` `effort:6`(既存items工程に合わせる)。master PNGはcommitしない。
+
+| File | Dimensions | Bytes | SHA-256 | Alpha |
+|---|---|---:|---|---|
+| `pot-copper.webp` | 384×384 | 29060 | `0b475977c14145b1c66c9048b35f5dd21eab1bcf1d5574bccfb4c441831c16ac` | 維持 |
+| `tool-paddle.webp` | 384×384 | 16264 | `3c8eb2ecee6e9c7211634040c5f7ff8c95b0c44c8b3c67899754712ab962f026` | 維持 |
+
+### 実装
+
+- `getShopItemImageUrl`へcopper/paddleを追加。cardとdetailは同じmapping。
+- 他商品の既存表示は維持。画像なし商品はneutral slot。
+- 価格・data・schema・game logic・AquariumScene/Catalog/NightBackdropは無変更。
+
+### scope外(本Milestone時点)
+
+- 残り21商品の商店接続は次工程(Full Product Art Rollout)へ移管
+- 本close記録ではproduct code / assetは変更しない
+
+### 検証
+
+- `npm test`: 148 passed
+- `npm run verify:derive`: OK
+- `npm run lint`: clean
+- Pages / Vercel 両base build: 成功
+- browser回帰(360/390/430): 代表5商品のcard/detail表示PASS、粘土鍋はneutral維持、overflowなし、asset 200、category icon fallbackなし
