@@ -170,8 +170,8 @@ describe("Milestone 2 media / detail contracts", () => {
     expect(getShopItemImageUrl(getShopItem("bowl-white"))).toContain("bowl-white.webp");
     expect(getShopItemImageUrl(getShopItem("copper"))).toContain("pot-copper.webp");
     expect(getShopItemImageUrl(getShopItem("paddle"))).toContain("tool-paddle.webp");
-    expect(getShopItemImageUrl(getShopItem("clay"))).toBeNull();
-    expect(getShopItemImageUrl(getShopItem("pebble"))).toBeNull();
+    expect(getShopItemImageUrl(getShopItem("clay"))).toContain("pot-clay.webp");
+    expect(getShopItemImageUrl(getShopItem("pebble"))).toContain("decoration-pebble.webp");
   });
 
   it("neutral media slotは固定aspect classを持ち、src無しならimgを出さない", () => {

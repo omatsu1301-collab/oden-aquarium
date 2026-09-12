@@ -109,7 +109,7 @@ describe("Wave 1C ShopScreen contracts", () => {
     expect(html).not.toContain('viewBox="0 0 24 24"');
   });
 
-  it("画像URLのない商品cardはimgを出さずslotだけを残す", () => {
+  it("正式asset接続後の商品cardはmedia slot内にimgを持ちcategory iconを使わない", () => {
     const pot = getShopItem("clay");
     const html = renderToStaticMarkup(
       createElement(ShopItemCard, {
@@ -119,7 +119,9 @@ describe("Wave 1C ShopScreen contracts", () => {
       }),
     );
     expect(html).toContain("shop-media-slot");
-    expect(html).not.toContain("<img");
+    expect(html).toContain("pot-clay.webp");
+    expect(html).toContain("<img");
+    expect(html).not.toContain("shop-item-card__icon");
   });
 
   it("商品card clickで既存detail openへitem.idを渡す", () => {

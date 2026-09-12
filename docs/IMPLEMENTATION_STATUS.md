@@ -963,3 +963,85 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 - `npm run lint`: clean
 - Pages / Vercel 両base build: 成功
 - browser回帰(360/390/430): 代表5商品のcard/detail表示PASS、粘土鍋はneutral維持、overflowなし、asset 200、category icon fallbackなし
+
+## Full Product Art Rollout
+
+- 状態: **MERGED / Independent Technical Audit PASS / Human Gate PASS。26/26 production接続を採用・lock。**
+- branch: `feat/phase3-full-product-art-rollout`
+- base / PR #18 merge SHA: `aa657aee231f4a6ad608603ae90cbe4fa5f6c7a4`
+- PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/19
+- implementation head: `21b5806122f1ee6dfd4676706e59f44cbd581001`
+- 目的: Visual Audit 26/26 PASS済みの商品artをproduction WebP化し、商店card/detailへ全26商品接続する。
+- source of truth: `_artifacts/product-art-review-26/`（master PNG / contact sheet / ZIPはcommitしない）
+
+### Gate結果(2026-09-12)
+
+- Independent Technical Audit: **PASS**
+- Human Gate: **PASS**
+- 26/26 production接続: **採用**
+- NEW 15 / REUSE 11 / TOTAL 26
+- 再生成対象: **0**
+- blocker: **なし**
+- 追加の画像再生成・production asset差し替え: **不要**
+
+### Gate前提
+
+- Full Product Art Visual Audit: **26 / 26 PASS**
+- 再生成対象: **0**
+- NEW_GENERATED: **15** / REUSE_PRODUCTION: **11** / TOTAL: **26**
+
+### 変換契約
+
+- output: WebP / resize 384×384 / fit contain / alpha維持
+- quality: 88 / alphaQuality: 100 / effort: 6
+- Milestone 4 `pot-copper` / `tool-paddle` と同規則
+- crop / 背景追加 / 色補正 / 内容変更なし
+
+### NEW 15 production asset
+
+| ID | Source (Review Pack) | Source Dim | Source SHA-256 | Production | Prod Dim | Bytes | Prod SHA-256 | Alpha |
+|---|---|---|---|---|---|---:|---|---|
+| `katsuo` | `broth/katsuo.png` | 1254×1254 | `2717141b73a9adab46f708007fe71d8a588c06177ca40f4ac850ea271bed7b77` | `broth-katsuo.webp` | 384×384 | 24464 | `58aa01952fafdf05e3f1b9f023a89f54b629f176f58e550b69b9086b3598b602` | 維持 |
+| `miso` | `broth/miso.png` | 1254×1254 | `a3806232f880301261bbe7a84030ba6037c764c59c2a85e2ad11fac7b8846b8f` | `broth-miso.webp` | 384×384 | 23020 | `988429841e6484604fc7b03f8863cfc9fe4ed41b7d740ab580d2131ebb151671` | 維持 |
+| `soy` | `broth/soy.png` | 1254×1254 | `d7593730269a6f4b482246fe482909d4f6975ae40f6234bf9d3ebc62468feeaf` | `broth-soy.webp` | 384×384 | 21618 | `8f175b4cc9859145faa11204f60f65b8c173de0c280c109ecd60f706f78e1056` | 維持 |
+| `salt` | `broth/salt.png` | 1254×1254 | `eef2bc75ab8324de1b5a04456b55362f015db52482dd7e753cab0842ed7e29af` | `broth-salt.webp` | 384×384 | 21078 | `28b5b1c4f6e846d30109b510e330f4dba51baba8b24420bc2ed70948c9d85d96` | 維持 |
+| `yuzu` | `broth/yuzu.png` | 1254×1254 | `472e6d32bbac21784c45c05dd7a53a49f563354ef97e544f8c70c4232f658d20` | `broth-yuzu.webp` | 384×384 | 18924 | `ddaaf2b043721895605dab58889bd74e8a615ed23e02178de60ed9bcf33d34a5` | 維持 |
+| `clay` | `pot/clay.png` | 1254×1254 | `476f45f4fb2ec1b920c9951cb34bde7d5f5957e41bfb054beeb450df8e2f3409` | `pot-clay.webp` | 384×384 | 31604 | `8c22305da44064ffdf174cd4e996f41a2bab5b5e22c3aa4a87eca19b7516c836` | 維持 |
+| `enamel` | `pot/enamel.png` | 1254×1254 | `d5c17e65a28ef2424d2139a3a9e5c19a518fed5d121fc2e041833aa05d13c460` | `pot-enamel.webp` | 384×384 | 18352 | `cd03b8cc2983606acf588433596e855efc2a6c49b988c0a9a226de95c3ac0990` | 維持 |
+| `deep` | `pot/deep.png` | 1254×1254 | `1e1f552f8643727e7e3b023e899d0271bd16295778c899b6ae8b0de785c3357c` | `pot-deep.webp` | 384×384 | 29744 | `d5ad08f775e02ca08836162480d884fc62801c8b34a602deeae0ca9aac26d81f` | 維持 |
+| `lid-wood` | `tool/lid-wood.png` | 1254×1254 | `dd9fd2f21c6055bbdcca6a172cabde5fbd80d76eff9d309dcafb1ee74c2f8f67` | `tool-lid-wood.webp` | 384×384 | 23424 | `7a57f6aa785e99dbf7a8f4f456175df355dd00ccd6496ef451b03c7783740c01` | 維持 |
+| `lid-ceramic` | `tool/lid-ceramic.png` | 1254×1254 | `426e56ad8a1b97fe132dc41e5e388adec3debe4c9915138beb46134a174402e7` | `tool-lid-ceramic.webp` | 384×384 | 17370 | `4366b9f541e056e9ce26679dcf57d9bec4791d6c8c132a876e481dc516bb87ab` | 維持 |
+| `lamp` | `tool/lamp.png` | 1254×1254 | `e12ac8c6050ad735f6d2ffac640cdbf2e5ae2418b118e1678c74729aa16b7d5b` | `tool-lamp.webp` | 384×384 | 20822 | `9c0be2ef0bbf134351af1cc99412a3cf91a60350eed057486d3d08c7911ad3dc` | 維持 |
+| `pebble` | `decoration-tank/pebble.png` | 1254×1254 | `e9c1886d4c3038a2cadfe835c94ea76a41d3e41fe9055fef59f47dfcb5eac55c` | `decoration-pebble.webp` | 384×384 | 26328 | `24961dc47902bab4ccaad631133d92f55abcc07dd500a028153812f9395dda28` | 維持 |
+| `kelp` | `decoration-tank/kelp.png` | 1254×1254 | `0475969952d718b6710e29d3e0c4b0c90f49a66f7f04e6db977725a2bec6c944` | `decoration-kelp.webp` | 384×384 | 27746 | `a406bca4134ef8bacced671a8361a265342518869b3ee7f0e72df989da81e129` | 維持 |
+| `hideout` | `decoration-tank/hideout.png` | 1254×1254 | `172b08ce60a12bb72e8a53f4a1e8053f34a83d162a2c6223b2f3f8c035e84bd5` | `decoration-hideout.webp` | 384×384 | 19704 | `fcbce28ac1e14306af4b249fcd4ff4a93caa128490b3a4f54ac47239297907a9` | 維持 |
+| `lantern` | `decoration-tank/lantern.png` | 1254×1254 | `646af288cc9463f54b43975df2381678b5f8b1be81448f554bbc55e417b374f3` | `decoration-lantern.webp` | 384×384 | 24320 | `6077da3638a4bfeabb1d9176e17af8975c4b3954aedf173395399f977008f129` | 維持 |
+
+### REUSE 11 (既存production再利用・再圧縮なし)
+
+- broth: `broth-kombu.webp`
+- pot: `pot-copper.webp`
+- tool: `tool-paddle.webp`
+- assist: `assist-drop.webp` / `assist-rich-drop.webp` / `assist-care.webp` / `assist-long-care.webp`
+- bowl: `bowl-white.webp` / `bowl-indigo.webp` / `bowl-cat.webp` / `bowl-black.webp`
+
+### 実装
+
+- `itemImages.js`: 出汁6種すべて専用mapping。未知IDのみ `broth-neutral.webp` fallback。
+- `shopItemMedia.js`: pot/tool/tank decorationを含む共通resolver。card/detail同一。
+- ShopMediaSlotのnull/load失敗neutral契約は維持。category icon fallbackは使わない。
+
+### scope外
+
+- 価格 / item data / tagline / effect / duration / slots / game logic / save schema / migration
+- AquariumScene / Catalog / NightBackdrop / shop shell / category icon / background C / 4status / assist・bowl game behavior
+- Review Pack master PNG・contact sheet・ZIPはcommitしない
+- 本close記録ではproduction code / asset / mappingは変更しない
+
+### 検証
+
+- `npm test`: 155 passed
+- `npm run verify:derive`: OK
+- `npm run lint`: clean
+- Pages / Vercel 両base build: 成功
+- browser回帰(360/390/430): 5tabすべてPASS、可視card計26で画像表示、unique asset 26、broken 0、overflowなし、category icon fallbackなし、asset HTTP 200、card/detail同一(lamp=`tool-lamp.webp` / lantern=`decoration-lantern.webp`)、BottomNav正常

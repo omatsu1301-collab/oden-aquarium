@@ -6,6 +6,7 @@ import { getShopItemImageUrl } from "../shopItemMedia.js";
 import { ShopItemCard } from "../../screens/ShopScreen.jsx";
 import { ShopItemDetailSheet } from "../../screens/ShopItemDetailSheet.jsx";
 import { createInitialGameState } from "../../game/state.js";
+import { ShopMediaSlot } from "../../components/ShopMediaSlot.jsx";
 
 const T0 = 1_700_000_000_000;
 
@@ -24,12 +25,6 @@ describe("Milestone 4 product art pilot mapping", () => {
       expect(url).toContain(file);
       expect(url).toContain(import.meta.env.BASE_URL);
     }
-  });
-
-  it("pilot以外の鍋・道具はneutralのまま", () => {
-    expect(getShopItemImageUrl(getShopItem("clay"))).toBeNull();
-    expect(getShopItemImageUrl(getShopItem("enamel"))).toBeNull();
-    expect(getShopItemImageUrl(getShopItem("lamp"))).toBeNull();
   });
 
   it("代表5商品のcardはmedia slot内にimg srcを持つ", () => {
@@ -63,5 +58,11 @@ describe("Milestone 4 product art pilot mapping", () => {
       expect(html).toContain("shop-media-slot");
       expect(html).toContain(file);
     }
+  });
+
+  it("ShopMediaSlotのnull/fallback契約は維持する", () => {
+    const html = renderToStaticMarkup(createElement(ShopMediaSlot, { src: null }));
+    expect(html).toContain("shop-media-slot");
+    expect(html).not.toContain("<img");
   });
 });

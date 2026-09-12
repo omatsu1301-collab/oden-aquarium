@@ -1,8 +1,6 @@
 // 現在の出汁を表示する器コンポーネント(仕様8章)。
 // 出汁IDから表示素材を解決する責務はdata/itemImages.jsへ集約し、ここは表示のみを担当する。
-// 昆布だしは専用画像、それ以外は採用済みの無地陶器(broth-neutral.webp)を表示する
-// (簡易SVG製フォールバックは廃止済み)。専用画像を追加する場合はitemImages.jsへ
-// 登録するだけでよい。
+// 正式出汁6種は専用画像。未知IDのみ無地陶器(broth-neutral.webp)へfallbackする。
 import { getBrothImageUrl } from "../data/itemImages.js";
 import "./BrothVessel.css";
 
