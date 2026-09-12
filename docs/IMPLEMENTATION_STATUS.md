@@ -909,10 +909,22 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 
 ## Milestone 4「Product Art Pilot」
 
-- 状態: **Draft PR作成へ進行中**
+- 状態: **MERGED / Technical Gate PASS / Visual Gate PASS。代表5商品のart directionをlock。**
 - branch: `feat/phase3-m4-product-art-pilot`
 - base / PR #17 merge SHA: `cdb210b1127f0979f0c3c76a7c55b59852067e93`
-- 目的: 代表5商品のproduct artをcard/detailへ仮接続し、Visual Gate用Previewを作る。26商品一括美術には進まない。
+- PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/18
+- head: `c5fb2f599add85936fe63282bca5fa44617907e8`
+- 目的: 代表5商品のproduct artをcard/detailへ仮接続し、Visual Gate用Previewを作る。
+
+### Gate結果(2026-09-12)
+
+- Technical Gate: **PASS**
+- Visual Gate: **PASS**
+- 採用代表5商品: `kombu` / `copper` / `paddle` / `drop` / `bowl-indigo`
+- 判断: 代表5商品のart directionを採用し、全商品量産基準として**lock**する。
+- Full Product Art Visual Audit: **26 / 26 PASS**（再生成対象 **0**）
+- Review Pack: `_artifacts/product-art-review-26/` / `ODEN_AQUARIUM_PRODUCT_ART_REVIEW_26_2026-09-12.zip`
+- 次工程: Full Product Art Rollout
 
 ### 代表5商品 mapping
 
@@ -939,10 +951,10 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 - 他商品の既存表示は維持。画像なし商品はneutral slot。
 - 価格・data・schema・game logic・AquariumScene/Catalog/NightBackdropは無変更。
 
-### scope外
+### scope外(本Milestone時点)
 
-- 残り21商品の美術生成・接続
-- Ready化、merge、production deploy、Milestone 5
+- 残り21商品の商店接続は次工程(Full Product Art Rollout)へ移管
+- 本close記録ではproduct code / assetは変更しない
 
 ### 検証
 
