@@ -966,11 +966,23 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 
 ## Full Product Art Rollout
 
-- 状態: **Draft PR作成へ進行中**
+- 状態: **MERGED / Independent Technical Audit PASS / Human Gate PASS。26/26 production接続を採用・lock。**
 - branch: `feat/phase3-full-product-art-rollout`
 - base / PR #18 merge SHA: `aa657aee231f4a6ad608603ae90cbe4fa5f6c7a4`
+- PR: https://github.com/omatsu1301-collab/oden-aquarium/pull/19
+- implementation head: `21b5806122f1ee6dfd4676706e59f44cbd581001`
 - 目的: Visual Audit 26/26 PASS済みの商品artをproduction WebP化し、商店card/detailへ全26商品接続する。
 - source of truth: `_artifacts/product-art-review-26/`（master PNG / contact sheet / ZIPはcommitしない）
+
+### Gate結果(2026-09-12)
+
+- Independent Technical Audit: **PASS**
+- Human Gate: **PASS**
+- 26/26 production接続: **採用**
+- NEW 15 / REUSE 11 / TOTAL 26
+- 再生成対象: **0**
+- blocker: **なし**
+- 追加の画像再生成・production asset差し替え: **不要**
 
 ### Gate前提
 
@@ -1023,8 +1035,8 @@ master PNGはrepositoryへcommitしていない(handoff入力のみ)。
 
 - 価格 / item data / tagline / effect / duration / slots / game logic / save schema / migration
 - AquariumScene / Catalog / NightBackdrop / shop shell / category icon / background C / 4status / assist・bowl game behavior
-- Ready化 / merge / production deploy / 次Milestone
 - Review Pack master PNG・contact sheet・ZIPはcommitしない
+- 本close記録ではproduction code / asset / mappingは変更しない
 
 ### 検証
 
